@@ -140,10 +140,10 @@ modular-text-divider/
 テスト・学習用のヴィジュネル暗号サンプルを用意しています：
 
 | サンプル | 鍵 | 鍵長 | 説明 | 備考 |
-|---------|-----|-----|-----|--------------|---|
-| vigenere1 | CAT | 3文字 | 短い鍵での基本例 |   |
-| vigenere2 | LOCK | 4文字 | 中程度の複雑さ |    |
-| vigenere3 | PADLOCK | 7文字 | より複雑な長い鍵 | 平文は[[『不思議の国のアリス』（"Alice's Adventures in Wonderland"）の第1章](https://www.gutenberg.org/files/11/11-h/11-h.htm#chap01) |
+|---------|-----|-----|-----|--------------|
+| vigenere1 | CAT | 3文字 | 短い鍵での基本例 | .  |
+| vigenere2 | LOCK | 4文字 | 中程度の複雑さ | .  |
+| vigenere3 | PADLOCK | 7文字 | より複雑な長い鍵 | 平文は[『不思議の国のアリス』（"Alice's Adventures in Wonderland"）の第1章](https://www.gutenberg.org/files/11/11-h/11-h.htm#chap01) |
 
 各サンプルには暗号文（ciphertext.txt）、鍵（key.txt）、平文（plaintext.txt）が含まれています。
 
