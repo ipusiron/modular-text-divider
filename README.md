@@ -153,7 +153,7 @@ modular-text-divider/
 
 各列に対して頻度分析を行いたい場合は、以下のツールと連携できます：
 
-👉 [Vigenère Cipher Tool (Frequency Analyzer)](https://ipusiron.github.io/vigenere-cipher-tool/)
+👉 [頻度分析ツール（Frequency Analyzer）](https://ipusiron.github.io/frequency-analyzer/)
 
 ### 連携方法
 
