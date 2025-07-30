@@ -344,7 +344,7 @@ function sendToFrequencyAnalyzer(text) {
   }
   
   const encodedText = encodeURIComponent(text);
-  const url = `https://ipusiron.github.io/vigenere-cipher-tool/?text=${encodedText}`;
+  const url = `https://ipusiron.github.io/frequency-analyzer/?text=${encodedText}`;
   window.open(url, '_blank');
 }
 

@@ -167,12 +167,12 @@ modular-text-divider/
 - コピー完了時にトースト通知で確認
 - Frequency Analyzerに手動で貼り付け
 
-### GET パラメーター仕様
+### GETパラメーター仕様
 
 本ツールは以下の形式でFrequency Analyzerにテキストを送信します：
 
 ```
-https://ipusiron.github.io/vigenere-cipher-tool/?text={URLエンコードされたテキスト}
+https://ipusiron.github.io/frequency-analyzer/?text={URLエンコードされたテキスト}
 ```
 
 **制限事項：**
@@ -185,7 +185,7 @@ https://ipusiron.github.io/vigenere-cipher-tool/?text={URLエンコードされ�
 **使用例：**
 
 ```
-https://ipusiron.github.io/vigenere-cipher-tool/?text=HELLO%20WORLD
+https://ipusiron.github.io/frequency-analyzer/?text=HELLO%20WORLD
 ```
 
 ---
