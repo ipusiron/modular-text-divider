@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Modular Text Divider</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>🧩 Modular Text Divider</h1>
+    <p>テキストを指定した分割数で周期的に列分割するツールです</p>
+  </header>
+
+  <main>
+    <!-- 入力エリア -->
+    <section>
+      <label for="input-text">📄 入力テキスト:</label><br />
+      <textarea id="input-text" rows="6" placeholder="ここに暗号文を入力するか、ファイルを読み込んでください"></textarea><br />
+      <button id="load-sample">🔤 サンプル文を入力</button>
+      <input type="file" id="file-input" accept=".txt" />
+      <button id="clear-button">🧹 クリア</button>
+    </section>
+
+    <!-- 分割数設定 -->
+    <section>
+      <label for="split-count">🔢 分割数 (n):</label>
+      <input type="number" id="split-count" min="1" max="20" value="3" />
+      <input type="range" id="split-slider" min="1" max="20" value="3" />
+      <div class="slider-labels">
+        <span>1</span>
+        <span class="mark">3</span>
+        <span class="mark">5</span>
+        <span>20</span>
+      </div>
+    </section>
+
+    <!-- オプション -->
+    <section>
+      <fieldset>
+        <legend>⚙️ テキスト処理オプション</legend>
+        <label><input type="checkbox" id="uppercase" /> 小文字を大文字に変換</label><br />
+        <label><input type="checkbox" id="alpha-only" /> アルファベット以外を除去</label><br />
+        <label><input type="checkbox" id="remove-spaces" /> スペースを除去</label>
+      </fieldset>
+    </section>
+
+    <!-- 処理後テキスト -->
+    <section>
+      <label for="processed-text">📝 処理後のテキスト:</label><br />
+      <textarea id="processed-text" rows="4" readonly></textarea>
+    </section>
+
+    <!-- 列分割ボタン -->
+    <section>
+      <button id="split-button">✂️ 列分割する</button>
+    </section>
+
+    <!-- 出力結果エリア -->
+    <section id="output-area"></section>
+
+    <!-- エクスポート設定 -->
+    <section id="export-section" style="display: none;">
+      <label>
+        <input type="checkbox" id="csv-with-index" />
+        拡張形式（元インデックス付き）でエクスポート
+      </label><br />
+      <button id="export-csv">📥 CSVとしてエクスポート</button>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer">
+      🔗 GitHubリポジトリはこちら（ <a href="https://github.com/ipusiron/modular-text-divider" target="_blank">ipusiron/modular-text-divider</a> ）
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
