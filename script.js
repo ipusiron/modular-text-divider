@@ -279,11 +279,22 @@ function exportCSV() {
     });
   }
 
+  // 現在の日時をファイル名に含める
+  const now = new Date();
+  const timestamp = now.getFullYear() +
+    String(now.getMonth() + 1).padStart(2, '0') +
+    String(now.getDate()).padStart(2, '0') + '_' +
+    String(now.getHours()).padStart(2, '0') +
+    String(now.getMinutes()).padStart(2, '0') +
+    String(now.getSeconds()).padStart(2, '0');
+  
+  const filename = `split_result_${timestamp}.csv`;
+
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "split_result.csv";
+  a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -337,6 +348,74 @@ function sendToFrequencyAnalyzer(text) {
   window.open(url, '_blank');
 }
 
+// ダークモード切り替え機能
+function initDarkMode() {
+  const darkModeToggle = document.getElementById('dark-mode-toggle');
+  const toggleIcon = darkModeToggle.querySelector('.toggle-icon');
+  
+  // ローカルストレージから設定を読み込み
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  
+  // アイコンを更新
+  updateToggleIcon(savedTheme);
+  
+  // トグルボタンのクリックイベント
+  darkModeToggle.addEventListener('click', () => {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateToggleIcon(newTheme);
+    
+    // トースト通知
+    showToast(`${newTheme === 'dark' ? '🌙 ダークモード' : '☀️ ライトモード'}に切り替えました`);
+  });
+}
+
+function updateToggleIcon(theme) {
+  const toggleIcon = document.querySelector('.toggle-icon');
+  toggleIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+}
+
+// ヘルプモーダル機能
+function initHelpModal() {
+  const helpButton = document.getElementById('help-button');
+  const helpModal = document.getElementById('help-modal');
+  const helpModalClose = document.getElementById('help-modal-close');
+  
+  // ヘルプボタンクリック
+  helpButton.addEventListener('click', () => {
+    helpModal.style.display = 'block';
+    document.body.style.overflow = 'hidden'; // 背景スクロール無効化
+  });
+  
+  // 閉じるボタンクリック
+  helpModalClose.addEventListener('click', () => {
+    helpModal.style.display = 'none';
+    document.body.style.overflow = 'auto'; // 背景スクロール復活
+  });
+  
+  // モーダル外クリックで閉じる
+  helpModal.addEventListener('click', (e) => {
+    if (e.target === helpModal) {
+      helpModal.style.display = 'none';
+      document.body.style.overflow = 'auto';
+    }
+  });
+  
+  // Escキーで閉じる
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && helpModal.style.display === 'block') {
+      helpModal.style.display = 'none';
+      document.body.style.overflow = 'auto';
+    }
+  });
+}
+
 // 初期処理
 updateProcessedText();
 updateSplitButtonState();
+initDarkMode();
+initHelpModal();

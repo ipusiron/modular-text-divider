@@ -8,8 +8,20 @@
 </head>
 <body>
   <header>
-    <h1>🧩 Modular Text Divider</h1>
-    <p>テキストを指定した分割数で周期的に列分割するツールです。</p>
+    <div class="header-content">
+      <div class="header-text">
+        <h1>🧩 Modular Text Divider</h1>
+        <p>テキストを指定した分割数で周期的に列分割するツールです。</p>
+      </div>
+      <div class="header-buttons">
+        <button id="help-button" class="header-btn" title="ヘルプを表示">
+          <span class="btn-icon">❓</span>
+        </button>
+        <button id="dark-mode-toggle" class="header-btn dark-mode-toggle" title="ダークモード切り替え">
+          <span class="toggle-icon">🌙</span>
+        </button>
+      </div>
+    </div>
   </header>
 
   <main>
@@ -111,6 +123,79 @@
         </label>
       </div>
     </section>
+  </div>
+
+  <!-- ヘルプモーダル -->
+  <div id="help-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🧩 Modular Text Divider - ヘルプ</h2>
+        <button class="modal-close" id="help-modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <section>
+          <h3>📖 このツールについて</h3>
+          <p>Modular Text Dividerは、テキストを指定した分割数で周期的に列分割するツールです。主にヴィジュネル暗号などの多表式暗号の解読で使用される「列分割処理」を効率的に行うことができます。</p>
+        </section>
+
+        <section>
+          <h3>🚀 基本的な使い方</h3>
+          <ol>
+            <li><strong>テキスト入力</strong>: 上部のテキストエリアに分割したいテキストを入力するか、ファイルをドラッグ&ドロップします</li>
+            <li><strong>分割数設定</strong>: スライダーまたは数値入力で分割数（1～20）を指定します</li>
+            <li><strong>処理オプション</strong>: 必要に応じて大文字変換、英字のみ抽出、スペース除去のオプションを選択します</li>
+            <li><strong>列分割実行</strong>: 「列分割する」ボタンをクリックして処理を実行します</li>
+            <li><strong>結果確認</strong>: 各列のテキストが表示され、コピーや頻度分析への連携が可能です</li>
+          </ol>
+        </section>
+
+        <section>
+          <h3>⚙️ 機能詳細</h3>
+          <h4>📄 テキスト処理オプション</h4>
+          <ul>
+            <li><strong>小文字を大文字に変換</strong>: すべての英字を大文字に統一します</li>
+            <li><strong>アルファベット以外を除去</strong>: 英字以外の文字（数字、記号、空白など）を削除します</li>
+            <li><strong>スペースを除去</strong>: 空白文字を削除します</li>
+          </ul>
+
+          <h4>📊 結果エリアの機能</h4>
+          <ul>
+            <li><strong>📋 コピー</strong>: 各列のテキストをクリップボードにコピーします</li>
+            <li><strong>📊 頻度分析 🔗</strong>: 選択した列のテキストを頻度分析ツールで開きます（新しいタブ）</li>
+            <li><strong>📥 CSVエクスポート</strong>: 分割結果をCSV形式でダウンロードします</li>
+          </ul>
+
+          <h4>🔗 外部ツール連携</h4>
+          <p>各列の「📊 頻度分析」ボタンをクリックすると、<a href="https://ipusiron.github.io/vigenere-cipher-tool/" target="_blank">Vigenère Cipher Tool</a>で頻度分析を行えます。5,000文字を超える場合は確認ダイアログが表示されます。</p>
+        </section>
+
+        <section>
+          <h3>🔐 ヴィジュネル暗号解読での使用例</h3>
+          <ol>
+            <li><strong>鍵長推定</strong>: カシスキー法などで鍵長の候補を特定</li>
+            <li><strong>列分割</strong>: 本ツールで推定した鍵長に基づいてテキストを分割</li>
+            <li><strong>頻度分析</strong>: 各列に対して個別に頻度分析を実行</li>
+            <li><strong>鍵推定</strong>: 英語の文字頻度と比較して各列の鍵文字を推定</li>
+            <li><strong>復号</strong>: 推定した鍵で暗号文を復号</li>
+          </ol>
+        </section>
+
+        <section>
+          <h3>💡 ヒント</h3>
+          <ul>
+            <li>ヴィジュネル暗号の解読では、通常「アルファベット以外を除去」と「小文字を大文字に変換」を有効にします</li>
+            <li>分割数は鍵長と同じに設定します（例：鍵が「CAT」なら分割数は3）</li>
+            <li>各列の文字数が極端に少ない場合は、分割数を減らすことを検討してください</li>
+            <li>頻度分析結果で最も頻出する文字がEの場合が多いため、これを基準に鍵を推定できます</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>🌙 ダークモード</h3>
+          <p>右上の月/太陽アイコンをクリックすることで、ライトモードとダークモードを切り替えできます。設定は自動的に保存されます。</p>
+        </section>
+      </div>
+    </div>
   </div>
 
   <footer>
