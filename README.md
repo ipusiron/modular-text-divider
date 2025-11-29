@@ -1,3 +1,40 @@
+<!--
+---
+id: day030
+slug: modular-text-divider
+
+title: "Modular Text Divider"
+
+subtitle_ja: "テキスト列分割ツール"
+subtitle_en: "Periodic Column Divider for Cryptanalysis"
+
+description_ja: "テキストを指定した分割数にしたがって周期的に分割するツール。多表式暗号（ヴィジュネル暗号など）の解読で不可欠な列分割処理を効率化し、頻度分析ツールとの連携で段階的な解読を支援する。"
+description_en: "A tool that periodically divides text into columns based on a specified divisor. Streamlines the column division process essential for breaking polyalphabetic ciphers (such as Vigenère cipher), enabling step-by-step cryptanalysis through integration with frequency analysis tools."
+
+category_ja:
+  - 暗号解析
+  - テキスト処理
+category_en:
+  - Cryptanalysis
+  - Text Processing
+
+difficulty: 1
+
+tags:
+  - vigenere
+  - cryptanalysis
+  - frequency-analysis
+  - polyalphabetic-cipher
+  - text-division
+  - modular-arithmetic
+
+repo_url: "https://github.com/ipusiron/modular-text-divider"
+demo_url: "https://ipusiron.github.io/modular-text-divider/"
+
+hub: true
+---
+-->
+
 # Modular Text Divider - テキスト列分割ツール
 
 ![GitHub Repo stars](https://img.shields.io/github/stars/ipusiron/modular-text-divider?style=social)

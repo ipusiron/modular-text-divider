@@ -31,10 +31,12 @@ This is a static web application with no build system. Common development tasks:
 4. **Output** → Display columns with copy buttons, CSV export option
 
 ### Key Functions in script.js
-- `preprocessText(text, options)` - Handles text transformations
+- `preprocessText(raw)` - Handles text transformations (reads options from DOM checkboxes)
+- `updateProcessedText()` - Triggers preprocessing pipeline and updates UI
 - `splitIntoColumns(text, n)` - Core algorithm for column division
-- `displayResults(result)` - Renders output to DOM
-- `exportCSV(includeIndices)` - Generates downloadable CSV
+- `renderColumnOutputs(columns)` - Creates DOM elements for column display
+- `exportCSV()` - Generates downloadable CSV (reads index option from DOM)
+- `sendToFrequencyAnalyzer(text)` - Opens external tool with text data (5,000 char limit)
 
 ### State Management
 - Minimal state in DOM elements
@@ -66,8 +68,15 @@ Manual testing via browser - no test framework. Key scenarios:
 - Copy button functionality
 - Edge cases (empty text, n=1, very large texts)
 
+## Custom Slash Commands
+
+This project includes Claude Code slash commands in `.claude/commands/`:
+
+- `/annotate` - Add Japanese comments to code (targets the most recently pasted code block)
+- `/reload-workspace` - Re-read all source files and sync Claude's memory with current filesystem
+
 ## Integration Notes
 
 This tool is designed to work with other tools in the series, particularly:
-- **Frequency Analyzer** - Analyze individual columns for letter frequencies
-- Future integration via URL parameters for tool chaining
+- **Frequency Analyzer** - Analyze individual columns for letter frequencies (https://ipusiron.github.io/frequency-analyzer/)
+- Integration via GET parameter: `?text={URLエンコードされたテキスト}`
