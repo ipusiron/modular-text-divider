@@ -3,6 +3,12 @@
 const i18n = (() => {
   const messages = {
   ja: {
+    "help.solve": "前処理後がA～Zだけなら、列ごとの◀▶や選択欄でシフトを変え、棒を英文の頻度の点と比べます。" +
+      "『💡 ヒント』でカイ二乗が最小の文字を見て、『このシフトにする』で適用できます。短い列では正解とは限りません。" +
+      "鍵と平文の先頭300文字を表示し、読み上げは鍵と先頭20文字だけです。『すべて A に戻す』でシフトを戻せます。" +
+      "日英切り替えはシフトとヒントを保ち、入力や設定の変更・再分割では破棄します。CSVは元の分割結果を出力します。",
+    "help.samples": "同梱サンプルを選んで『読み込む』を押すと、前処理3種と分割数（3・4・7）を設定して分割します。" +
+      "file://でも使えます。固定文の『🔤 サンプル文を入力』も残しています。Tabで移動し、ボタンはEnterやSpace、選択欄は矢印キーで操作できます。",
     "samples.label": "同梱サンプル",
     "samples.choose": "選んでください",
     "samples.one": "サンプル1（短い鍵）",
@@ -139,6 +145,14 @@ const i18n = (() => {
     "help.limits": "?text=…&n=…で受け取ると前処理をすべてオンにし、両方が有効なら分割します。URLは10,000文字、分割数は1～20、ファイルは1 MBまでです。読込後にtextとnをURLから消します。入力や設定を変えると結果を隠します。文字数はコードポイント単位です。",
   },
   en: {
+    "help.solve": "When the processed text contains only A–Z, adjust each column with the arrows or selector and compare bars with English-frequency dots. " +
+      "Select “💡 Hint” to reveal the minimum-chi-square letter, then “Use this shift” to apply it. Short columns may give incorrect hints. " +
+      "The key and first 300 plaintext characters are shown; announcements contain only the key and first 20 characters. " +
+      "“Reset all to A” resets shifts. Switching languages preserves shifts and hints; editing inputs or settings and splitting again discards them. " +
+      "CSV exports the original split result.",
+    "help.samples": "Choose a bundled sample and press “Load” to enable all preprocessing and split into 3, 4, or 7 columns. " +
+      "This works under file://. The fixed-text “🔤 Load sample” button is also available. " +
+      "Use Tab to move, Enter or Space for buttons, and arrow keys for selectors.",
     "samples.label": "Bundled samples",
     "samples.choose": "Choose a sample",
     "samples.one": "Sample 1 (short key)",
