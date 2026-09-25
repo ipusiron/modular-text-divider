@@ -138,4 +138,5 @@ This tool is designed to work with other tools in the series, particularly:
 - README.md and README.en.md have matching 14 sections, complete annotated trees, and five screenshot references.
 - Screenshot states: vigenere1/3 columns/light Japanese (input and results); vigenere2/4 columns/dark English via URL.
 - Keep screenshots 1–3 unchanged. Add 4: vigenere1/light Japanese/CAA and 5: vigenere3/dark English/PADLOCK after seven hints.
-- SVG bars and dots use CSS classes; geometry uses SVG attributes, not inline styles. All controls remain at least 44px.
+- SVG bars and dots use CSS classes; geometry uses SVG attributes, not inline styles. Interactive targets remain at least 44px.
+- Checkbox visuals are 20×20px; their enclosing clickable labels provide targets at least 44×44px, including text and padding.

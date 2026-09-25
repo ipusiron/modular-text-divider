@@ -7,6 +7,23 @@ const root = path.join(__dirname, '..');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const app = fs.readFileSync(path.join(root, 'js/app.js'), 'utf8');
 
+test('checkbox visuals are compact while their labels retain touch targets', () => {
+  const css = fs.readFileSync(path.join(root, 'style.css'), 'utf8');
+  const checkbox = css.match(/\ninput\[type="checkbox"\]\s*\{([^}]+)\}/g).at(-1);
+  const label = css.match(/label:has\(input\[type="checkbox"\]\)\s*\{([^}]+)\}/)[1];
+  for (const prop of ['width', 'height', 'min-width', 'min-height']) {
+    assert.match(checkbox, new RegExp(`\\b${prop}: 20px;`));
+  }
+  assert.match(checkbox, /flex: 0 0 20px/);
+  assert.match(label, /min-width: 44px/);
+  assert.match(label, /min-height: 44px/);
+  assert.match(label, /padding: 0 12px/);
+  assert.match(css, /input:not\(\[type="checkbox"\]\)/);
+  for (const id of ['uppercase', 'alpha-only', 'remove-spaces', 'csv-with-index']) {
+    assert.match(html, new RegExp(`<label[^>]*>\\s*<input[^>]*id="${id}"`));
+  }
+});
+
 test('hand solving and bundled sample controls use local scripts and safe SVG', () => {
   for (const id of ['solve-section', 'solve-guidance', 'solve-workspace', 'solve-key', 'solve-plain',
     'solve-live', 'solve-reset', 'solve-cards', 'sample-select', 'load-bundled-sample']) {
