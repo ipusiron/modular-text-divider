@@ -3,6 +3,37 @@
 const i18n = (() => {
   const messages = {
   ja: {
+    "help.solve": "前処理後がA～Zだけなら、列ごとの◀▶や選択欄でシフトを変え、棒を英文の頻度の点と比べます。" +
+      "『💡 ヒント』でカイ二乗が最小の文字を見て、『このシフトにする』で適用できます。短い列では正解とは限りません。" +
+      "鍵と平文の先頭300文字を表示し、読み上げは鍵と先頭20文字だけです。『すべて A に戻す』でシフトを戻せます。" +
+      "日英切り替えはシフトとヒントを保ち、入力や設定の変更・再分割では破棄します。CSVは元の分割結果を出力します。",
+    "help.samples": "同梱サンプルを選んで『読み込む』を押すと、前処理3種と分割数（3・4・7）を設定して分割します。" +
+      "file://でも使えます。固定文の『🔤 サンプル文を入力』も残しています。Tabで移動し、ボタンはEnterやSpace、選択欄は矢印キーで操作できます。",
+    "samples.label": "同梱サンプル",
+    "samples.choose": "選んでください",
+    "samples.one": "サンプル1（短い鍵）",
+    "samples.two": "サンプル2（4文字の鍵）",
+    "samples.three": "サンプル3（長文）",
+    "samples.load": "読み込む",
+    "solve.title": "🧮 手で解く",
+    "solve.guidance": "手で解くには、前処理で『小文字を大文字に変換』と『アルファベット以外を除去』をオンにしてください",
+    "solve.intro": "各列は同じ鍵の文字でずらされた『シーザー暗号』です。棒グラフの山の形が、英文の頻度（点）に重なるシフトを探してください。",
+    "solve.key": "いまの鍵: {key}",
+    "solve.plain": "組み立てた平文（全文 {count} 文字・先頭300文字）",
+    "solve.reset": "すべて A に戻す",
+    "solve.column": "列 {number}（{count} 文字）",
+    "solve.shift": "列 {number} の鍵の文字",
+    "solve.previous": "列 {number} のシフトを1つ戻す",
+    "solve.next": "列 {number} のシフトを1つ進める",
+    "solve.chi": "いまのシフトの χ²: {value}",
+    "solve.hint": "💡 ヒント",
+    "solve.seen": "✓ ヒント確認済み",
+    "solve.best": "カイ二乗が最小になるのは {letter}（{value}）",
+    "solve.apply": "このシフトにする",
+    "solve.graph": "列 {number} の文字の割合と英文の頻度",
+    "solve.legend": "棒: この列の文字の割合 ／ 点: 英文の頻度",
+    "solve.live": "鍵 {key}。平文の先頭: {start}",
+    "solve.option": "{letter}（{shift}）",
     "ui.0": "Modular Text Divider - テキスト列分割ツール",
     "ui.1": "🧩 Modular Text Divider",
     "ui.2": "テキストを指定した分割数で周期的に列分割するツールです。",
@@ -114,6 +145,39 @@ const i18n = (() => {
     "help.limits": "?text=…&n=…で受け取ると前処理をすべてオンにし、両方が有効なら分割します。URLは10,000文字、分割数は1～20、ファイルは1 MBまでです。読込後にtextとnをURLから消します。入力や設定を変えると結果を隠します。文字数はコードポイント単位です。",
   },
   en: {
+    "help.solve": "When the processed text contains only A–Z, adjust each column with the arrows or selector and compare bars with English-frequency dots. " +
+      "Select “💡 Hint” to reveal the minimum-chi-square letter, then “Use this shift” to apply it. Short columns may give incorrect hints. " +
+      "The key and first 300 plaintext characters are shown; announcements contain only the key and first 20 characters. " +
+      "“Reset all to A” resets shifts. Switching languages preserves shifts and hints; editing inputs or settings and splitting again discards them. " +
+      "CSV exports the original split result.",
+    "help.samples": "Choose a bundled sample and press “Load” to enable all preprocessing and split into 3, 4, or 7 columns. " +
+      "This works under file://. The fixed-text “🔤 Load sample” button is also available. " +
+      "Use Tab to move, Enter or Space for buttons, and arrow keys for selectors.",
+    "samples.label": "Bundled samples",
+    "samples.choose": "Choose a sample",
+    "samples.one": "Sample 1 (short key)",
+    "samples.two": "Sample 2 (4-letter key)",
+    "samples.three": "Sample 3 (long text)",
+    "samples.load": "Load",
+    "solve.title": "🧮 Solve by Hand",
+    "solve.guidance": "To solve by hand, enable “Convert lowercase to uppercase” and “Remove non-alphabetic characters” in preprocessing.",
+    "solve.intro": "Each column is a Caesar cipher shifted by one key letter. Find a shift whose bars match the English frequencies (dots).",
+    "solve.key": "Current key: {key}",
+    "solve.plain": "Assembled plaintext ({count} characters; first 300 shown)",
+    "solve.reset": "Reset all to A",
+    "solve.column": "Column {number} ({count} characters)",
+    "solve.shift": "Key letter for column {number}",
+    "solve.previous": "Previous shift for column {number}",
+    "solve.next": "Next shift for column {number}",
+    "solve.chi": "Current shift χ²: {value}",
+    "solve.hint": "💡 Hint",
+    "solve.seen": "✓ Hint viewed",
+    "solve.best": "Minimum chi-square: {letter} ({value})",
+    "solve.apply": "Use this shift",
+    "solve.graph": "Letter percentages and English frequencies for column {number}",
+    "solve.legend": "Bars: column percentages / dots: English frequencies",
+    "solve.live": "Key {key}. Plaintext begins: {start}",
+    "solve.option": "{letter} ({shift})",
     "ui.0": "Modular Text Divider - Periodic Column Divider",
     "ui.1": "🧩 Modular Text Divider",
     "ui.2": "Divide text into periodic columns for cryptanalysis.",

@@ -36,10 +36,27 @@ for (const [lang, file] of docs.entries()) {
     }
   });
 
-  test(`${file}: matching fourteen sections and three actual PNGs`, () => {
+  test(`${file}: three solving rows are recomputed from core and bundled files`, () => {
+    const table = doc.split('<!-- solve-answers -->')[1].split('<!-- /solve-answers -->')[0];
+    const rows = table.split('\n').filter(l => l.startsWith('| `')).map(l => l.split('|').slice(1, -1).map(s => s.trim()));
+    assert.equal(rows.length, 3);
+    assert.deepEqual(rows.map(r => r[0]), ['`vigenere1`', '`vigenere2`', '`vigenere3`']);
+    assert.deepEqual(rows.map(r => Number(r[1])), [3, 4, 7]);
+    for (const [id, n, key, prefix] of rows) {
+      const text = core.preprocess(read(`samples/${id.replaceAll('`', '')}/ciphertext.txt`), { upper: true, alphaOnly: true });
+      const columns = core.split(text, Number(n)).columns;
+      const solved = core.solve(columns, columns.map(core.bestShift));
+      assert.equal(key, solved.key);
+      assert.equal(prefix, solved.plain.slice(0, 40));
+    }
+    assert.match(doc, /a5a177200b573836654a52d49fac8d76851dbf7993385072e309e1d8a23486e3/);
+  });
+
+  test(`${file}: matching fourteen sections and five actual PNGs`, () => {
     assert.deepEqual([...doc.matchAll(/^## (.+)$/gm)].map(m => m[1]), headings.map(h => h[lang]));
     const images = [...doc.matchAll(/!\[[^\]]*\]\((assets\/[^)]+)\)/g)].map(m => m[1]).sort();
-    assert.deepEqual(images, ['assets/screenshot1.png', 'assets/screenshot2.png', 'assets/screenshot3.png']);
+    assert.deepEqual(images, ['assets/screenshot1.png', 'assets/screenshot2.png', 'assets/screenshot3.png',
+      'assets/screenshot4.png', 'assets/screenshot5.png']);
     assert.deepEqual(fs.readdirSync(path.join(root, 'assets')).filter(f => f.endsWith('.png')).map(f => `assets/${f}`).sort(), images);
     for (const image of images) {
       const buffer = fs.readFileSync(path.join(root, image));
@@ -72,6 +89,9 @@ for (const [lang, file] of docs.entries()) {
       return entry.isDirectory() ? walk(name) : [name];
     });
     assert.deepEqual(entries.sort(), walk('').sort());
+    const tests = fs.readdirSync(path.join(root, 'test')).filter(f => f.endsWith('.test.js'));
+    assert.equal(tests.length, 7);
+    for (const name of tests) assert.ok(doc.includes(`| ${name} |`), name);
   });
 }
 

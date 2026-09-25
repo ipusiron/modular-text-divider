@@ -36,6 +36,14 @@ Preprocessing, Unicode-aware splitting, CSV export, and URL input run entirely i
 
 *Preprocessed vigenere2 received through the URL and automatically split into 4 columns (dark, English, 1280×1200, 213,787 bytes).*
 
+![Solving by hand in progress](assets/screenshot4.png)
+
+*vigenere1 with the key set to CAA, showing the assembled plaintext and all 3 graphs (light, Japanese, 1280×1200, 203,953 bytes).*
+
+![Plaintext after applying seven hints](assets/screenshot5.png)
+
+*vigenere3 after applying hints to all 7 columns: key PADLOCK and plaintext beginning “DOWNT HERAB BITHO…” (dark, English, 1280×1200, 165,345 bytes).*
+
 ---
 
 ## ✨ Features
@@ -46,6 +54,7 @@ Preprocessing, Unicode-aware splitting, CSV export, and URL input run entirely i
 - **File input**: Upload a .txt file
 - **Drag and drop**: Drop a text file into the input zone
 - **Sample input**: Load a fixed sample with one button
+- **Bundled samples**: Choose one of 3 ciphertexts, load it, enable preprocessing, and split at its configured count
 - **Live character counts**: Counts for both raw and processed text
 
 ### ⚙️ Preprocessing options
@@ -68,6 +77,13 @@ Preprocessing, Unicode-aware splitting, CSV export, and URL input run entirely i
 - **📋 Copy**: Copy a column to the clipboard
 - **📊 Frequency analysis**: Open the column in an external frequency analyzer in a new tab
 - **URL input**: Receive ciphertext and a key length from Day028 using `?text=…&n=…`
+
+### 🧮 Solve by Hand
+
+- **Per-column shifts**: Choose key letters A–Z and compare the bars with dots representing English frequencies
+- **Assembled plaintext**: Show the current key and the first 300 plaintext characters grouped in fives
+- **Per-column hints**: Reveal the minimum-chi-square shift and apply it with a separate user action
+- **Preserved state**: Keep shifts and hints when switching languages; reset all shifts to A when splitting again
 
 ### 📥 Export
 
@@ -96,7 +112,18 @@ Preprocessing, Unicode-aware splitting, CSV export, and URL input run entirely i
 5. Editing input, preprocessing, or the column count hides the result. Split again after changes.
 
 Open help with ❓. Tab cycles inside the dialog; Escape closes it and returns focus to the help button.
-“🔤 Load sample” inserts the fixed sample. There is no in-app selector for bundled samples.
+“🔤 Load sample” inserts the fixed sample. The selector beside it loads one of the bundled samples when you press “Load”.
+Loading enables all three preprocessing options, sets the sample's column count (3, 4, or 7), and splits it. This also works under file://.
+
+### 🧮 Solve by Hand
+
+1. Split text whose preprocessed form contains only uppercase A–Z.
+2. Use a column's ◀▶ buttons or key-letter selector to change its shift and compare its bars with the English-frequency dots.
+3. If needed, select “💡 Hint”, then “Use this shift” to apply the suggestion to that column.
+4. Read the current key and assembled plaintext. Select “Reset all to A” to reset the shifts.
+
+There is no button to solve all columns automatically. Use Tab to move, Enter or Space for buttons, and arrow keys for selectors.
+Editing the input or column count also discards shifts and hints.
 
 ### 📁 Sample data
 
@@ -110,6 +137,12 @@ The repository includes Vigenère ciphertext samples for testing and learning.
 
 Each sample contains ciphertext.txt, key.txt, and plaintext.txt.
 
+### Bundled samples
+
+The vigenere2 plaintext.txt previously duplicated the vigenere3 plaintext, so it was replaced with the plaintext recovered from its ciphertext and key.
+The corrected file contains 1,146 bytes of the Gettysburg Address (UTF-8, no newline).
+SHA-256: `a5a177200b573836654a52d49fac8d76851dbf7993385072e309e1d8a23486e3`.
+
 ### Intended uses
 
 - Support cryptanalysis of polyalphabetic ciphers such as Vigenère
@@ -121,6 +154,9 @@ Each sample contains ciphertext.txt, key.txt, and plaintext.txt.
 ---
 
 ## 🔐 Typical Vigenère Cryptanalysis Workflow
+
+Day028 RepeatSeq Analyzer estimates keys automatically using per-column chi-square scores.
+Day030 treats each column as a Caesar cipher shifted by one key letter, letting you match shifts by eye against the frequency profile.
 
 ### 1. Estimate the key length with the Kasiski examination
 
@@ -139,7 +175,8 @@ Analyze each column's letter frequencies and use statistical methods to estimate
 
 Try the estimated key and check whether the result is meaningful plaintext.
 
-This tool supports step 2. Combining its output with [Frequency Analyzer](https://ipusiron.github.io/frequency-analyzer/) supports the wider cryptanalysis workflow.
+This tool supports column splitting in step 2 and manual experimentation in steps 3 and 4.
+You can also examine individual columns with [Frequency Analyzer](https://ipusiron.github.io/frequency-analyzer/).
 
 ---
 
@@ -174,6 +211,27 @@ Tests recompute this table using DividerCore and the actual sample files.
 | `vigenere2` | 4 | QDPDYCZQ CQOSMGCO WQPXGCWV BBNOKQBR | 287, 287, 286, 286 |
 | `vigenere3` | 7 | SGDTXDNU OALWNGTS ZEHDQHLL YMLDTECE HWZPBJSH JVKGIGFK ORMQDBYX | 1232, 1232, 1232, 1232, 1232, 1232, 1231 |
 <!-- /known-answers -->
+
+### Solving by Hand
+
+With A=0 through Z=25, decrypt a column's ciphertext letter c using shift s as `p = (c - s + 26) mod 26`.
+Bars show the column's letter percentages; dots show the same 26 Lewand English-frequency values used by Day009 and Day028.
+For column length L and letter frequency f_j (%), the expected count is `E_j = L × f_j / 100`.
+Given the original column's counts C, the score is `χ²(s) = Σ(j=0..25) (C[(j+s) mod 26] - E_j)² / E_j`.
+Hints choose the lowest score, breaking ties toward the smaller shift. Short columns may not yield the correct key letter.
+
+Reassemble shifted columns by taking position i from `columns[i mod n][floor(i/n)]`.
+The display shows the first 300 characters grouped in fives and reports the full character count. CSV still exports the original split result.
+
+<!-- solve-answers -->
+| Sample | Columns | Key formed by hint letters | First 40 plaintext characters |
+|---|---|---|---|
+| `vigenere1` | 3 | CAT | WHENINAPRILTHESWEETSHOWERSFALLANDPIERCET |
+| `vigenere2` | 4 | LOCK | FOURSCOREANDSEVENYEARSAGOOURFATHERSBROUG |
+| `vigenere3` | 7 | PADLOCK | DOWNTHERABBITHOLEALICEWASBEGINNINGTOGETV |
+<!-- /solve-answers -->
+
+Tests recompute this table using DividerCore and the bundled files.
 
 ---
 
@@ -311,12 +369,13 @@ GitHub Actions runs the same tests on push and pull_request.
 
 | Test | Coverage |
 |---|---|
-| core.test.js | Known answers, 3 sample sets, 200 seeded Unicode texts × counts 1–20, CSV parsing |
+| core.test.js | Split/solve answers, 3 sample sets, 200 seeded texts × counts 1–20 round trips, shift round trips, CSV parsing |
+| samples.test.js | Embedded ciphertext bytes, recovered plaintext, and the corrected plaintext SHA-256 |
 | i18n.test.js | Dictionary keys, values, placeholders, used keys, Japanese literals, help integration |
 | html.test.js | Core delegation, CSP, referrer, ARIA, safe DOM operations, file limits |
-| contrast.test.js | Text contrast ≥4.5:1 and focus contrast ≥3:1 in both themes |
+| contrast.test.js | Text contrast ≥4.5:1; focus, bars, and dots ≥3:1 in both themes |
 | format.test.js | Maximum line lengths and minimum line counts |
-| readme.test.js | Known-answer tables, YAML, complete file tree, 14 matching sections, 3 images |
+| readme.test.js | Splitting and solving tables, YAML, complete file tree, 14 matching sections, 5 images |
 
 Browser checks cover HTTP and file://, Japanese and English at 1280/768/390/320px,
 keyboard operation, blocked storage, first-paint theme, and actual CSV downloads.
@@ -339,12 +398,15 @@ modular-text-divider/               # Project root
 ├── assets/                         # README screenshots
 │   ├── screenshot1.png             # Input and settings (vigenere1, 3 columns)
 │   ├── screenshot2.png             # Three output columns and CSV export
-│   └── screenshot3.png             # Four columns received via URL (dark, English, vigenere2)
+│   ├── screenshot3.png             # Four columns received via URL (dark, English, vigenere2)
+│   ├── screenshot4.png             # Solving in progress (light, Japanese, key CAA)
+│   └── screenshot5.png             # Seven hints applied (dark, English, key PADLOCK)
 ├── index.html                      # Input, results, CSV, help, and CSP
 ├── js/                             # Classic scripts with file:// support
 │   ├── app.js                      # State, UI, files, integration, and help
 │   ├── divider-core.js             # Pure preprocessing, splitting, CSV, and URL core
 │   ├── i18n.js                     # Japanese/English dictionaries and switching, including help
+│   ├── samples.js                  # Three bundled ciphertexts embedded as a classic script
 │   └── theme-init.js               # Theme application before first paint
 ├── package.json                    # Dependency-free npm test command
 ├── samples/                        # Ciphertext, keys, and plaintext for known-answer tests
@@ -367,6 +429,7 @@ modular-text-divider/               # Project root
     ├── format.test.js              # Line lengths and minimum line counts
     ├── html.test.js                # CSP, ARIA, and safe DOM operations
     ├── i18n.test.js                # Dictionary keys, values, and Japanese literal rules
+    ├── samples.test.js             # Embedded ciphertexts, corrected plaintext, and SHA-256
     └── readme.test.js              # Tables, YAML, trees, images, and headings
 ```
 
@@ -394,4 +457,3 @@ The project uses AI assistance to create and publish security-related tools over
 See the project page for details and other tools.
 
 🔗 [100 Security Tools with Generative AI](https://akademeia.info/?page_id=42163)
-

@@ -73,6 +73,14 @@ English: [README.en.md](README.en.md)
 
 *前処理したvigenere2をURLで受け取り自動分割した4列（ダーク・英語、1280×1200、213,787バイト）。*
 
+![手で解く途中](assets/screenshot4.png)
+
+*vigenere1の鍵をCAAまで合わせた状態。組み立てた平文と3枚の棒グラフ（ライト・日本語、1280×1200、203,953バイト）。*
+
+![7列のヒントを適用した平文](assets/screenshot5.png)
+
+*vigenere3の7列にヒントを適用した鍵PADLOCKと平文の先頭「DOWNT HERAB BITHO…」（ダーク・英語、1280×1200、165,345バイト）。*
+
 ---
 
 ## ✨ 機能
@@ -82,6 +90,7 @@ English: [README.en.md](README.en.md)
 - **ファイル読み込み**: .txtファイルのアップロード対応
 - **ドラッグ&ドロップ**: ファイルを直接ドラッグして読み込み
 - **サンプル文入力**: ワンクリックでサンプルテキストを挿入
+- **同梱サンプル**: 3つの暗号文を選んで読み込み、前処理と分割数を設定して分割
 - **リアルタイム文字数表示**: 入力・処理後テキストの文字数を表示
 
 ### ⚙️ テキスト処理オプション
@@ -101,6 +110,13 @@ English: [README.en.md](README.en.md)
 - **📋 コピー機能**: 各列のテキストをワンクリックでクリップボードにコピー
 - **📊 頻度分析連携**: 各列のテキストを外部の頻度分析ツールで開く（新しいタブ）
 - **URL受け取り**: Day028から`?text=…&n=…`で暗号文と鍵長を受け取り
+
+### 🧮 手で解く
+
+- **列ごとのシフト**: A～Zの鍵の文字を選び、棒グラフを英文の頻度の点と比較
+- **平文の組み立て**: いまの鍵と、平文の先頭300文字を5文字区切りで表示
+- **列ごとのヒント**: カイ二乗が最小のシフトを表示し、利用者の操作で適用
+- **状態の保持**: 日英切り替えでシフトとヒントの状態を保持。分割し直すとすべてAに戻る
 
 ### 📥 エクスポート機能
 - **CSV形式出力**: RFC 4180形式、UTF-8のBOMとCRLFでダウンロード
@@ -127,7 +143,18 @@ English: [README.en.md](README.en.md)
 5. 入力・前処理・分割数を変えると結果は隠れる。変更後はもう一度分割する。
 
 ヘルプは❓から開きます。Tabでダイアログ内を移動し、Escで閉じると元のボタンに戻ります。
-「🔤 サンプル文を入力」は固定文を読み込みます。同梱samples/の選択機能はありません。
+「🔤 サンプル文を入力」は固定文を読み込みます。その隣で同梱サンプルを選び「読み込む」を押すと、
+前処理3種とサンプルの分割数（3・4・7）を設定して分割します。file://でも使えます。
+
+### 🧮 手で解く
+
+1. 前処理後がA～Zの大文字だけになるようにして分割する。
+2. 列の◀▶または鍵の文字の選択欄でシフトを変え、棒と英文の頻度の点を見比べる。
+3. 必要なら「💡 ヒント」を押し、「このシフトにする」でその列に適用する。
+4. いまの鍵と組み立てた平文を読む。「すべて A に戻す」でシフトをリセットする。
+
+全列を一度に自動で合わせるボタンはありません。キー操作はTabで移動し、ボタンはEnterまたはSpace、
+選択欄は矢印キーで操作できます。入力や分割数を変えるとシフト・ヒントも破棄します。
 
 ### 📁 サンプルデータ
 
@@ -141,6 +168,12 @@ English: [README.en.md](README.en.md)
 | vigenere3 | PADLOCK | 7文字 | より複雑な長い鍵 | 平文は[『不思議の国のアリス』（"Alice's Adventures in Wonderland"）の第1章](https://www.gutenberg.org/files/11/11-h/11-h.htm#chap01) |
 
 各サンプルには暗号文（ciphertext.txt）、鍵（key.txt）、平文（plaintext.txt）が含まれています。
+
+### 同梱サンプル
+
+vigenere2のplaintext.txtは、以前はvigenere3の平文と同じ中身になっていたので、暗号文を鍵で戻した平文に置き換えました。
+訂正後はゲティスバーグ演説の1,146バイト（UTF-8、改行なし）です。
+SHA-256: `a5a177200b573836654a52d49fac8d76851dbf7993385072e309e1d8a23486e3`。
 
 ### 想定される用途
 
@@ -156,6 +189,9 @@ English: [README.en.md](README.en.md)
 
 ヴィジュネル暗号の解読は以下の段階的なプロセスで行われます。
 
+Day028 RepeatSeq Analyzerは列ごとのカイ二乗から鍵を自動推定します。
+Day030では、各列を同じ鍵の文字でずらされたシーザー暗号として扱い、頻度の形を見ながら手でシフトを合わせます。
+
 ### 1. **カシスキー法による鍵長特定**
 暗号文中の同じ文字列の出現間隔を測定し、鍵長の候補を絞り込む。Day028 [RepeatSeq Analyzer](https://ipusiron.github.io/repeatseq-analyzer/)で推定した鍵長（20以下）と暗号文を`?text=…&n=…`で本ツールへ渡す
 
@@ -168,7 +204,8 @@ English: [README.en.md](README.en.md)
 ### 4. **復号と検証**
 推定した鍵で復号を試行し、意味のある平文が得られるかを確認
 
-**本ツールは上記プロセスの「ステップ2」を効率化**し、カシスキー法で得られた鍵長候補を用いて暗号文を適切に列分割します。分割後の各列は[Frequency Analyzer](https://ipusiron.github.io/frequency-analyzer/)などの頻度分析ツールと連携することで、完全な解読ワークフローを実現できます。
+**本ツールは「ステップ2」の列分割に加え、ステップ3・4を手で試す操作を支援**します。
+各列は[Frequency Analyzer](https://ipusiron.github.io/frequency-analyzer/)でも詳しく調べられます。
 
 ---
 
@@ -201,6 +238,27 @@ textがあれば前処理をすべてオンにし、textとnの両方が有効�
 | `vigenere2` | 4 | QDPDYCZQ CQOSMGCO WQPXGCWV BBNOKQBR | 287, 287, 286, 286 |
 | `vigenere3` | 7 | SGDTXDNU OALWNGTS ZEHDQHLL YMLDTECE HWZPBJSH JVKGIGFK ORMQDBYX | 1232, 1232, 1232, 1232, 1232, 1232, 1231 |
 <!-- /known-answers -->
+
+### 手で解く
+
+A=0～Z=25として、列の暗号文字cをシフトsで戻す式は`p = (c - s + 26) mod 26`です。
+各列の文字の割合を棒、英文の頻度を点で表示します。英文の頻度はDay009・Day028と同じLewandの26値です。
+列の長さをL、文字jの頻度（%）をf_jとすると、期待度数は`E_j = L × f_j / 100`です。
+元の列の出現回数をCとすると、`χ²(s) = Σ(j=0..25) (C[(j+s) mod 26] - E_j)² / E_j`で求めます。
+ヒントはχ²が最小のシフトを選び、同点なら小さいシフトを採用します。短い列では正解になるとは限りません。
+
+シフトで戻した各列から、位置iの文字を`columns[i mod n][floor(i/n)]`で取り出して平文を組み立てます。
+表示は先頭300文字を5文字区切りにしたもので、全文の文字数も示します。CSVは元の分割結果のままです。
+
+<!-- solve-answers -->
+| サンプル | 分割数 | ヒントの文字を並べた鍵 | 平文の先頭40文字 |
+|---|---|---|---|
+| `vigenere1` | 3 | CAT | WHENINAPRILTHESWEETSHOWERSFALLANDPIERCET |
+| `vigenere2` | 4 | LOCK | FOURSCOREANDSEVENYEARSAGOOURFATHERSBROUG |
+| `vigenere3` | 7 | PADLOCK | DOWNTHERABBITHOLEALICEWASBEGINNINGTOGETV |
+<!-- /solve-answers -->
+
+この表はDividerCoreと同梱ファイルから再計算するテストで確認します。
 
 ---
 
@@ -343,12 +401,13 @@ GitHub Actionsはpushとpull_requestで同じテストを実行します。
 
 | テスト | 内容 |
 |---|---|
-| core.test.js | 指定の既知解答、同梱サンプル3種、固定シードのUnicode文200本×分割数1～20、CSV読み戻し |
+| core.test.js | 分割・手で解く既知解答、同梱サンプル3種、固定シード200本×分割数1～20の往復、シフト往復、CSV読み戻し |
+| samples.test.js | 埋め込み暗号文のバイト一致、平文の復号一致、訂正平文のSHA-256 |
 | i18n.test.js | 日英のキー・値・埋め込み変数、使用キー、日本語リテラル、ヘルプの連携先 |
 | html.test.js | 中核の使用、CSP・referrer・ARIA・安全なDOM操作・ファイル上限 |
-| contrast.test.js | 両テーマの文字4.5:1以上、フォーカス3:1以上 |
+| contrast.test.js | 両テーマの文字4.5:1以上、フォーカス・棒・点3:1以上 |
 | format.test.js | 最長行と行数下限による可読性の検査 |
-| readme.test.js | 既知解答表、YAML、全ファイルのツリー、14節の対応、画像3枚 |
+| readme.test.js | 分割と手で解く既知解答表、YAML、全ファイルのツリー、14節の対応、画像5枚 |
 
 ブラウザー確認ではHTTPとfile://の両方を使い、1280・768・390・320pxの日英、
 キーボード、保存遮断、初回テーマ、CSVの実ダウンロードを確認します。
@@ -371,12 +430,15 @@ modular-text-divider/               # プロジェクトのルート
 ├── assets/                         # README用のスクリーンショット
 │   ├── screenshot1.png             # 入力と分割設定（vigenere1、3列）
 │   ├── screenshot2.png             # 分割結果3列とCSV出力
-│   └── screenshot3.png             # URL受取後の4列（ダーク・英語、vigenere2）
+│   ├── screenshot3.png             # URL受取後の4列（ダーク・英語、vigenere2）
+│   ├── screenshot4.png             # 手で解く途中（ライト・日本語、鍵CAA）
+│   └── screenshot5.png             # 7列のヒント適用後（ダーク・英語、鍵PADLOCK）
 ├── index.html                      # 入力・結果・CSV・ヘルプ・CSP
 ├── js/                             # classic script（file://対応）
 │   ├── app.js                      # 状態・画面・ファイル・連携・ヘルプ
 │   ├── divider-core.js             # 前処理・分割・CSV・URLの純粋な中核
 │   ├── i18n.js                     # ヘルプを含む日英辞書と言語切り替え
+│   ├── samples.js                  # 同梱暗号文3種を埋め込むclassic script
 │   └── theme-init.js               # 初回描画前のテーマ適用
 ├── package.json                    # 依存なしのnpm test定義
 ├── samples/                        # 既知解答テストで読む暗号文と鍵・平文
@@ -399,6 +461,7 @@ modular-text-divider/               # プロジェクトのルート
     ├── format.test.js              # 最長行・行数によるminifyの検出
     ├── html.test.js                # CSP・ARIA・安全なDOM操作
     ├── i18n.test.js                # 辞書のキー・値・日本語リテラル
+    ├── samples.test.js             # 埋め込み暗号文・訂正平文・SHA-256
     └── readme.test.js              # 表・YAML・ツリー・画像・見出し
 ```
 

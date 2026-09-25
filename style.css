@@ -41,6 +41,8 @@ a.analyze-btn-inline {
   --mark-text: #c62828;
   --link-text: #4454c9;
   --focus-ring: #4454c9;
+  --solve-bar: #4454c9;
+  --solve-dot: #a13a17;
   --drop-area-bg: #f9f9f9;
   --drop-area-border: #ccc;
   --drop-area-hover-bg: #f0f8ff;
@@ -67,6 +69,8 @@ a.analyze-btn-inline {
   --mark-text: #ff8a80;
   --link-text: #a3b1ff;
   --focus-ring: #a3b1ff;
+  --solve-bar: #a3b1ff;
+  --solve-dot: #ffc46b;
   --drop-area-bg: #2d3748;
   --drop-area-border: #4a5568;
   --drop-area-hover-bg: #374151;
@@ -694,7 +698,7 @@ fieldset {
   min-width: 0;
 }
 
-button, input, a, [role="button"] {
+button, input, select, a, [role="button"] {
   min-height: 44px;
   min-width: 44px;
 }
@@ -717,7 +721,7 @@ a {
   overflow-wrap: anywhere;
 }
 
-:is(button, input, textarea, a, [role="button"]):focus-visible {
+:is(button, input, select, textarea, a, [role="button"]):focus-visible {
   outline: 3px solid var(--focus-ring);
   outline-offset: 3px;
 }
@@ -734,6 +738,97 @@ a {
 
 .modal-open {
   overflow: hidden;
+}
+
+select {
+  max-width: 100%;
+  min-width: 0;
+  padding: 8px;
+  font: inherit;
+  color: var(--text-color);
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 6px;
+}
+
+.button-group-right {
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+#solve-section {
+  min-width: 0;
+}
+
+#solve-cards {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.solve-card {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  background: var(--card-bg);
+}
+
+.solve-card h3 {
+  margin: 0 0 8px;
+}
+
+.solve-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.solve-controls button {
+  padding: 8px;
+}
+
+.solve-controls select {
+  flex: 1;
+}
+
+.solve-graph {
+  width: 100%;
+  height: auto;
+  min-height: 170px;
+  display: block;
+  margin-top: 12px;
+}
+
+.solve-graph text {
+  fill: var(--text-color);
+  font: 24px monospace;
+}
+
+.solve-bar { fill: var(--solve-bar); }
+.solve-dot { fill: var(--solve-dot); stroke: var(--card-bg); stroke-width: 1; }
+
+.solve-plain {
+  font-family: monospace;
+  overflow-wrap: anywhere;
+}
+
+#solve-key { font-weight: 700; overflow-wrap: anywhere; }
+.solve-hint-body p { margin: 8px 0; }
+.hint-viewed { border-color: var(--focus-ring); }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (min-width: 769px) {
+  #solve-cards { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
 }
 
 textarea::placeholder {
@@ -787,4 +882,3 @@ textarea::placeholder {
     padding-right: 20px;
   }
 }
-

@@ -50,6 +50,14 @@
       </div>
       <div class="button-group-right">
         <button type="button" id="load-sample"><span data-i18n="ui.11">🔤 サンプル文を入力</span></button>
+        <label for="sample-select" data-i18n="samples.label">同梱サンプル</label>
+        <select id="sample-select">
+          <option value="" data-i18n="samples.choose">選んでください</option>
+          <option value="vigenere1" data-i18n="samples.one">サンプル1（短い鍵）</option>
+          <option value="vigenere2" data-i18n="samples.two">サンプル2（4文字の鍵）</option>
+          <option value="vigenere3" data-i18n="samples.three">サンプル3（長文）</option>
+        </select>
+        <button type="button" id="load-bundled-sample" data-i18n="samples.load" disabled>読み込む</button>
         <button type="button" id="clear-button"><span data-i18n="ui.12">🧹 クリア</span></button>
       </div>
     </section>
@@ -125,6 +133,21 @@
     <p id="result-summary" role="status" aria-live="polite"></p>
     <section id="output-area"></section>
 
+    <section id="solve-section" aria-labelledby="solve-title" hidden>
+      <h2 id="solve-title" data-i18n="solve.title">🧮 手で解く</h2>
+      <p id="solve-guidance" data-i18n="solve.guidance" hidden></p>
+      <div id="solve-workspace" hidden>
+        <p data-i18n="solve.intro"></p>
+        <p data-i18n="solve.legend"></p>
+        <p id="solve-key"></p>
+        <p id="solve-plain-label"></p>
+        <p id="solve-plain" class="solve-plain"></p>
+        <p id="solve-live" class="sr-only" aria-live="polite" aria-atomic="true"></p>
+        <button type="button" id="solve-reset" data-i18n="solve.reset">すべて A に戻す</button>
+        <div id="solve-cards"></div>
+      </div>
+    </section>
+
     <!-- エクスポート設定 -->
     <section id="export-section">
       <div class="export-controls">
@@ -145,6 +168,11 @@
         <button type="button" class="modal-close" id="help-modal-close" aria-label="ヘルプを閉じる" data-i18n-aria-label="ui.85"><span data-i18n="ui.28">&times;</span></button>
       </div>
       <div class="modal-body">
+        <section>
+          <h3 data-i18n="solve.title">🧮 手で解く</h3>
+          <p data-i18n="help.solve"></p>
+          <p data-i18n="help.samples"></p>
+        </section>
         <section>
           <h3><span data-i18n="ui.29">📖 このツールについて</span></h3>
           <p><span data-i18n="ui.30">Modular Text Dividerは、テキストを指定した分割数で周期的に列分割するツールです。主にヴィジュネル暗号などの多表式暗号の解読で使用される「列分割処理」を効率的に行うことができます。</span></p>
@@ -220,6 +248,7 @@
   </footer>
 
   <script src="js/divider-core.js"></script>
+  <script src="js/samples.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/app.js"></script>
 </body>

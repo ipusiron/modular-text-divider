@@ -72,7 +72,68 @@ const DividerCore = (() => {
     return out;
   }
 
-  return { MAX_N, MAX_PARAM_CHARS, MAX_FILE_BYTES, preprocess, validateN, split, csvCell, toCsv, readParams };
+  const ALPHA = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  // 英文の文字頻度（%、A〜Z）。Day009 Frequency Analyzer・Day028 RepeatSeq Analyzer と同じ値（Lewand）
+  const ENGLISH_FREQ = [8.167, 1.492, 2.782, 4.253, 12.702, 2.228, 2.015, 6.094, 6.966, 0.153, 0.772, 4.025, 2.406,
+    6.749, 7.507, 1.929, 0.095, 5.987, 6.327, 9.056, 2.758, 0.978, 2.360, 0.150, 1.974, 0.074];
+
+  // 手で解けるのは A〜Z の大文字だけの文字列（前処理で「大文字」「英字だけ」をオンにした状態）
+  function isSolvable(text) {
+    return /^[A-Z]+$/.test(text);
+  }
+
+  // 列を鍵の文字（シフト s＝0〜25、A=0）で戻す（ヴィジュネルの復号＝引き算）
+  function shiftBack(col, s) {
+    let out = '';
+    for (const c of col) out += ALPHA[(c.charCodeAt(0) - 65 - s + 26) % 26];
+    return out;
+  }
+
+  // 文字の出現回数（A〜Z の26個）
+  function letterCounts(col) {
+    const n = new Array(26).fill(0);
+    for (const c of col) n[c.charCodeAt(0) - 65]++;
+    return n;
+  }
+
+  // シフト s で戻したときのカイ二乗（Day028 の chiSquare と同じ式）
+  function chiSquare(col, s) {
+    const cnt = letterCounts(col);
+    let chi = 0;
+    for (let j = 0; j < 26; j++) {
+      const e = ENGLISH_FREQ[j] / 100 * col.length;
+      const o = cnt[(j + s) % 26];
+      chi += (o - e) * (o - e) / e;
+    }
+    return chi;
+  }
+
+  // カイ二乗が最小のシフト（同点は小さいほう）
+  function bestShift(col) {
+    let best = 0, bestChi = Infinity;
+    for (let s = 0; s < 26; s++) {
+      const chi = chiSquare(col, s);
+      if (chi < bestChi) { bestChi = chi; best = s; }
+    }
+    return best;
+  }
+
+  // 列を位置 i mod n の順に戻して1本の文字列にする（split の逆）
+  function interleave(columns) {
+    const cols = columns.map(c => Array.from(c));
+    const total = cols.reduce((a, c) => a + c.length, 0);
+    let out = '';
+    for (let i = 0; i < total; i++) out += cols[i % cols.length][Math.floor(i / cols.length)];
+    return out;
+  }
+
+  // 各列をシフトで戻して組み立てた平文と、シフトから作った鍵
+  function solve(columns, shifts) {
+    return { plain: interleave(columns.map((c, i) => shiftBack(c, shifts[i]))), key: shifts.map(s => ALPHA[s]).join('') };
+  }
+
+  return { MAX_N, MAX_PARAM_CHARS, MAX_FILE_BYTES, preprocess, validateN, split, csvCell, toCsv, readParams,
+    ALPHA, ENGLISH_FREQ, isSolvable, shiftBack, letterCounts, chiSquare, bestShift, interleave, solve };
 })();
 
 if (typeof module !== 'undefined' && module.exports) {
