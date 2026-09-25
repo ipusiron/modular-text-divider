@@ -344,6 +344,7 @@ GitHub Actionsはpushとpull_requestで同じテストを実行します。
 | テスト | 内容 |
 |---|---|
 | core.test.js | 指定の既知解答、同梱サンプル3種、固定シードのUnicode文200本×分割数1～20、CSV読み戻し |
+| samples.test.js | 埋め込み暗号文のバイト一致、平文の復号一致、訂正平文のSHA-256 |
 | i18n.test.js | 日英のキー・値・埋め込み変数、使用キー、日本語リテラル、ヘルプの連携先 |
 | html.test.js | 中核の使用、CSP・referrer・ARIA・安全なDOM操作・ファイル上限 |
 | contrast.test.js | 両テーマの文字4.5:1以上、フォーカス3:1以上 |
@@ -377,6 +378,7 @@ modular-text-divider/               # プロジェクトのルート
 │   ├── app.js                      # 状態・画面・ファイル・連携・ヘルプ
 │   ├── divider-core.js             # 前処理・分割・CSV・URLの純粋な中核
 │   ├── i18n.js                     # ヘルプを含む日英辞書と言語切り替え
+│   ├── samples.js                  # 同梱暗号文3種を埋め込むclassic script
 │   └── theme-init.js               # 初回描画前のテーマ適用
 ├── package.json                    # 依存なしのnpm test定義
 ├── samples/                        # 既知解答テストで読む暗号文と鍵・平文
@@ -399,6 +401,7 @@ modular-text-divider/               # プロジェクトのルート
     ├── format.test.js              # 最長行・行数によるminifyの検出
     ├── html.test.js                # CSP・ARIA・安全なDOM操作
     ├── i18n.test.js                # 辞書のキー・値・日本語リテラル
+    ├── samples.test.js             # 埋め込み暗号文・訂正平文・SHA-256
     └── readme.test.js              # 表・YAML・ツリー・画像・見出し
 ```
 

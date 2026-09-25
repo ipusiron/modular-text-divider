@@ -312,6 +312,7 @@ GitHub Actions runs the same tests on push and pull_request.
 | Test | Coverage |
 |---|---|
 | core.test.js | Known answers, 3 sample sets, 200 seeded Unicode texts × counts 1–20, CSV parsing |
+| samples.test.js | Embedded ciphertext bytes, recovered plaintext, and the corrected plaintext SHA-256 |
 | i18n.test.js | Dictionary keys, values, placeholders, used keys, Japanese literals, help integration |
 | html.test.js | Core delegation, CSP, referrer, ARIA, safe DOM operations, file limits |
 | contrast.test.js | Text contrast ≥4.5:1 and focus contrast ≥3:1 in both themes |
@@ -345,6 +346,7 @@ modular-text-divider/               # Project root
 │   ├── app.js                      # State, UI, files, integration, and help
 │   ├── divider-core.js             # Pure preprocessing, splitting, CSV, and URL core
 │   ├── i18n.js                     # Japanese/English dictionaries and switching, including help
+│   ├── samples.js                  # Three bundled ciphertexts embedded as a classic script
 │   └── theme-init.js               # Theme application before first paint
 ├── package.json                    # Dependency-free npm test command
 ├── samples/                        # Ciphertext, keys, and plaintext for known-answer tests
@@ -367,6 +369,7 @@ modular-text-divider/               # Project root
     ├── format.test.js              # Line lengths and minimum line counts
     ├── html.test.js                # CSP, ARIA, and safe DOM operations
     ├── i18n.test.js                # Dictionary keys, values, and Japanese literal rules
+    ├── samples.test.js             # Embedded ciphertexts, corrected plaintext, and SHA-256
     └── readme.test.js              # Tables, YAML, trees, images, and headings
 ```
 
@@ -394,4 +397,3 @@ The project uses AI assistance to create and publish security-related tools over
 See the project page for details and other tools.
 
 🔗 [100 Security Tools with Generative AI](https://akademeia.info/?page_id=42163)
-
