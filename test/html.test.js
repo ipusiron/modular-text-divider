@@ -29,7 +29,7 @@ test('CSP, referrer, synchronous theme and safe markup', () => {
     "base-uri 'none'", "form-action 'none'"]) assert.ok(html.includes(rule), rule);
   assert.doesNotMatch(html, /unsafe-inline|frame-ancestors|\sstyle\s*=|\son\w+\s*=/i);
   assert.match(html, /name="referrer" content="no-referrer"/);
-  assert.match(html, /<noscript>/);
+  assert.match(html, /<noscript\b[^>]*>/);
   assert.match(html.split('</head>')[0], /<script src="js\/theme-init.js"><\/script>/);
   assert.match(html, /role="dialog"[^>]*aria-modal="true"[^>]*aria-labelledby="help-title"/);
   for (const tag of html.match(/<button\b[^>]*>/g)) assert.match(tag, /type="button"/);

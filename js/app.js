@@ -36,8 +36,8 @@ const splitError = document.getElementById("split-error");
 
 // 文字数を更新
 function updateCharCounts() {
-  inputCharCount.textContent = `（文字数: ${Array.from(inputText.value).length}）`;
-  processedCharCount.textContent = `（文字数: ${Array.from(processedText.value).length}）`;
+  i18n.assign(inputCharCount, 'count', { count: Array.from(inputText.value).length });
+  i18n.assign(processedCharCount, 'count', { count: Array.from(processedText.value).length });
 }
 
 // 列分割ボタンの状態を更新
@@ -47,12 +47,7 @@ function updateSplitButtonState() {
 
 function validateSplitCount(value) {
   const result = DividerCore.validateN(value);
-  const messages = {
-    empty: '分割数を入力してください',
-    notInteger: '分割数は整数を入力してください',
-    range: '分割数は1～20の範囲で入力してください'
-  };
-  splitError.textContent = result.ok ? '' : messages[result.reason];
+  i18n.assign(splitError, result.ok ? '' : result.reason);
   return result.ok;
 }
 
@@ -95,13 +90,13 @@ fileInput.addEventListener("change", (e) => {
 function readFile(file) {
   if (!file) return;
   const error = document.getElementById('file-error');
-  error.textContent = '';
+  i18n.assign(error, '');
   if (!(file.name.toLowerCase().endsWith('.txt') || file.type.startsWith('text/'))) {
-    error.textContent = 'テキストファイルを選択してください';
+    i18n.assign(error, 'fileType');
     return;
   }
   if (file.size > DividerCore.MAX_FILE_BYTES) {
-    error.textContent = 'ファイルは1 MB以下にしてください';
+    i18n.assign(error, 'fileSize');
     return;
   }
   const reader = new FileReader();
@@ -109,7 +104,7 @@ function readFile(file) {
     inputText.value = e.target.result;
     updateProcessedText();
   };
-  reader.onerror = () => { error.textContent = 'ファイルの読み込みに失敗しました'; };
+  reader.onerror = () => { i18n.assign(error, 'fileRead'); };
   reader.readAsText(file);
 }
 
@@ -152,7 +147,7 @@ function preprocessText(raw) {
 
 function updateProcessedText() {
   invalidateResult();
-  splitError.textContent = '';
+  i18n.assign(splitError, '');
   const raw = inputText.value;
   processedText.value = preprocessText(raw);
   updateCharCounts();
@@ -187,7 +182,7 @@ function splitIntoColumns(text, n) {
   renderColumnOutputs(state.result.columns);
   exportCsvBtn.disabled = false;
   resultsContainer.hidden = false;
-  document.getElementById('result-summary').textContent = `${n}列に分割しました`;
+  i18n.assign(document.getElementById('result-summary'), 'splitDone', { count: n });
 }
 
 function renderColumnOutputs(columns) {
@@ -200,39 +195,41 @@ function renderColumnOutputs(columns) {
     headerDiv.className = "column-header";
 
     const countLabel = document.createElement("p");
-    countLabel.textContent = `📏 列 ${i + 1}（文字数: ${Array.from(col).length}）`;
+    i18n.assign(countLabel, 'column', { number: i + 1, count: Array.from(col).length });
+    countLabel.id = `column-label-${i}`;
 
     const buttonGroup = document.createElement("div");
     buttonGroup.className = "column-buttons";
 
     const copyBtn = document.createElement("button");
     copyBtn.type = 'button';
-    copyBtn.textContent = "📋 コピー";
+    i18n.assign(copyBtn, 'ui.48');
     copyBtn.className = "copy-btn-inline";
     copyBtn.addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(col);
-        showToast(`📋 Column ${i + 1} をクリップボードにコピーしました`);
+        showToast('copied', { number: i + 1 });
       } catch (err) {
-        showToast('❌ コピーに失敗しました');
+        showToast('copyFailed');
       }
     });
 
     const analyzeBtn = document.createElement("a");
     const truncated = Array.from(col).length > 5000;
-    analyzeBtn.textContent = truncated ? '先頭5,000文字で頻度分析' : '📊 頻度分析で開く';
+    i18n.assign(analyzeBtn, truncated ? 'analyzeLong' : 'analyze');
     analyzeBtn.className = "analyze-btn-inline";
     analyzeBtn.href = 'https://ipusiron.github.io/frequency-analyzer/?text=' +
       encodeURIComponent(Array.from(col).slice(0, 5000).join(''));
     analyzeBtn.target = '_blank';
     analyzeBtn.rel = 'noopener noreferrer';
-    analyzeBtn.title = 'このテキストを頻度分析ツールで開きます（新しいタブで外部サイトに移動）';
+    analyzeBtn.title = i18n.t('analyzeTitle');
+    analyzeBtn.setAttribute('data-i18n-title', 'analyzeTitle');
 
     const textarea = document.createElement("textarea");
     textarea.rows = 3;
     textarea.readOnly = true;
     textarea.value = col;
-    textarea.setAttribute('aria-label', countLabel.textContent);
+    textarea.setAttribute('aria-labelledby', countLabel.id);
 
     buttonGroup.appendChild(copyBtn);
     buttonGroup.appendChild(analyzeBtn);
@@ -254,12 +251,12 @@ function performSplit() {
   
   const n = parseInt(splitCount.value, 10);
   if (clean.length === 0) {
-    splitError.textContent = 'テキストを入力してください';
+    i18n.assign(splitError, 'noText');
     return;
   }
   const validation = DividerCore.validateN(splitCount.value, Array.from(clean).length);
   if (!validation.ok) {
-    splitError.textContent = `分割数がテキスト長（${validation.length}文字）を超えています。`;
+    i18n.assign(splitError, 'tooLarge', { length: validation.length });
     return;
   }
   splitIntoColumns(clean, n);
@@ -295,7 +292,7 @@ function exportCSV() {
 document.getElementById("export-csv").addEventListener("click", exportCSV);
 
 // トースト通知
-function showToast(message, duration = 3000) {
+function showToast(key, values = {}, duration = 3000) {
   // 既存のトーストがあれば削除
   const existingToast = document.querySelector('.toast');
   if (existingToast) {
@@ -307,7 +304,7 @@ function showToast(message, duration = 3000) {
   toast.className = 'toast';
   toast.setAttribute('role', 'status');
   toast.setAttribute('aria-live', 'polite');
-  toast.textContent = message;
+  i18n.assign(toast, key, values);
   document.body.appendChild(toast);
 
   // アニメーション開始
@@ -335,11 +332,13 @@ function receiveParams() {
   }
   if (params.n !== null) splitCount.value = splitSlider.value = String(params.n);
   updateProcessedText();
-  const warnings = {
-    textTooLong: 'URLのテキストが10,000文字を超えるため読み込みませんでした',
-    badN: 'URLの分割数は1～20の整数にしてください'
-  };
-  document.getElementById('url-warning').textContent = params.warnings.map(w => warnings[w]).join(' ');
+  const warning = document.getElementById('url-warning');
+  warning.replaceChildren();
+  params.warnings.forEach(key => {
+    const item = document.createElement('span');
+    i18n.assign(item, key);
+    warning.append(item, document.createTextNode(' '));
+  });
   if (params.text !== null && params.n !== null) performSplit();
   const url = new URL(location.href);
   url.searchParams.delete('text');
@@ -367,7 +366,7 @@ function initDarkMode() {
     updateToggleIcon(newTheme);
     
     // トースト通知
-    showToast(`${newTheme === 'dark' ? '🌙 ダークモード' : '☀️ ライトモード'}に切り替えました`);
+    showToast(newTheme === 'dark' ? 'theme.dark' : 'theme.light');
   });
 }
 
@@ -434,3 +433,6 @@ updateSplitButtonState();
 initDarkMode();
 initHelpModal();
 receiveParams();
+document.addEventListener('language-changed', () => {
+  updateToggleIcon(document.documentElement.dataset.theme);
+});
