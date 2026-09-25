@@ -1,5 +1,18 @@
 /* style.css - カード風＋モダンレイアウト */
 
+[hidden] {
+  display: none !important;
+}
+
+a.analyze-btn-inline {
+  display: inline-flex;
+  align-items: center;
+  background: var(--button-bg);
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
 :root {
   /* Light mode colors */
   --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

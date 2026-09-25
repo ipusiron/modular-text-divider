@@ -14,7 +14,7 @@ test('new JavaScript and tests stay readable', () => {
 });
 
 test('source line count floors', () => {
-  for (const [file, min] of [['style.css', 600], ['index.html', 150], ['script.js', 200], ['js/divider-core.js', 60]]) {
+  for (const [file, min] of [['style.css', 600], ['index.html', 150], ['js/app.js', 200], ['js/divider-core.js', 60]]) {
     assert.ok(fs.readFileSync(path.join(root, file), 'utf8').split('\n').length >= min, file);
   }
 });
