@@ -7,6 +7,24 @@ const root = path.join(__dirname, '..');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const app = fs.readFileSync(path.join(root, 'js/app.js'), 'utf8');
 
+test('hand solving and bundled sample controls use local scripts and safe SVG', () => {
+  for (const id of ['solve-section', 'solve-guidance', 'solve-workspace', 'solve-key', 'solve-plain',
+    'solve-live', 'solve-reset', 'solve-cards', 'sample-select', 'load-bundled-sample']) {
+    assert.ok(html.includes(`id="${id}"`), id);
+  }
+  assert.match(html, /id="solve-live"[^>]*aria-live="polite"/);
+  assert.ok(html.indexOf('id="output-area"') < html.indexOf('id="solve-section"'));
+  assert.ok(html.indexOf('id="solve-section"') < html.indexOf('id="export-section"'));
+  assert.ok(html.indexOf('js/samples.js') < html.indexOf('js/app.js'));
+  assert.match(app, /createElementNS/);
+  for (const call of ['isSolvable', 'shiftBack', 'letterCounts', 'chiSquare', 'bestShift', 'solve']) {
+    assert.ok(app.includes(`DividerCore.${call}(`), call);
+  }
+  for (const file of fs.readdirSync(path.join(root, 'js'))) {
+    assert.doesNotMatch(fs.readFileSync(path.join(root, 'js', file), 'utf8'), /\bfetch\s*\(|XMLHttpRequest|console\.log/);
+  }
+});
+
 test('application delegates splitting and CSV to the reference core', () => {
   for (const call of ['preprocess', 'validateN', 'split', 'toCsv', 'readParams']) {
     assert.ok(app.includes(`DividerCore.${call}(`), call);

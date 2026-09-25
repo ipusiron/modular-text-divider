@@ -2,6 +2,7 @@
 
 let lastSplitResult = null;
 const state = { raw: '', options: {}, n: '3', result: null };
+const solveState = { shifts: [], hints: new Set() };
 
 function invalidateResult() {
   state.raw = inputText.value;
@@ -16,6 +17,10 @@ function invalidateResult() {
   outputArea.replaceChildren();
   resultsContainer.hidden = true;
   exportCsvBtn.disabled = true;
+  solveState.shifts = [];
+  solveState.hints.clear();
+  document.getElementById('solve-section').hidden = true;
+  document.getElementById('solve-cards').replaceChildren();
 }
 
 // UI要素の取得
@@ -78,6 +83,19 @@ function loadSample() {
 }
 
 document.getElementById("load-sample").addEventListener("click", loadSample);
+
+const sampleSelect = document.getElementById('sample-select');
+const sampleLoad = document.getElementById('load-bundled-sample');
+sampleSelect.addEventListener('change', () => { sampleLoad.disabled = !sampleSelect.value; });
+sampleLoad.addEventListener('click', () => {
+  const sample = DividerSamples.find(item => item.id === sampleSelect.value);
+  if (!sample) return;
+  inputText.value = sample.text;
+  ['uppercase', 'alpha-only', 'remove-spaces'].forEach(id => { document.getElementById(id).checked = true; });
+  splitCount.value = splitSlider.value = String(sample.n);
+  updateProcessedText();
+  performSplit();
+});
 
 // ファイル読み込み
 const fileInput = document.getElementById("file-input");
@@ -183,6 +201,9 @@ function splitIntoColumns(text, n) {
   exportCsvBtn.disabled = false;
   resultsContainer.hidden = false;
   i18n.assign(document.getElementById('result-summary'), 'splitDone', { count: n });
+  solveState.shifts = new Array(n).fill(0);
+  solveState.hints.clear();
+  renderSolve();
 }
 
 function renderColumnOutputs(columns) {
@@ -427,6 +448,121 @@ function initHelpModal() {
   });
 }
 
+function solveElement(tag, key, values = {}, className = '') {
+  const element = document.createElement(tag);
+  if (key) i18n.assign(element, key, values);
+  if (className) element.className = className;
+  return element;
+}
+
+function svgElement(tag, attributes) {
+  const element = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const [name, value] of Object.entries(attributes)) element.setAttribute(name, String(value));
+  return element;
+}
+
+function renderSolveGraph(column, shift, number) {
+  const counts = DividerCore.letterCounts(DividerCore.shiftBack(column, shift));
+  const percentages = counts.map(count => count / column.length * 100);
+  const ceiling = Math.max(15, ...percentages, ...DividerCore.ENGLISH_FREQ);
+  const svg = svgElement('svg', { viewBox: '0 0 364 218', role: 'img',
+    'aria-label': i18n.t('solve.graph', { number }), class: 'solve-graph' });
+  for (let j = 0; j < 26; j++) {
+    const height = percentages[j] / ceiling * 148;
+    svg.append(svgElement('rect', { x: j * 14 + 2, y: 156 - height, width: 10, height, class: 'solve-bar' }));
+    svg.append(svgElement('circle', { cx: j * 14 + 7, cy: 156 - DividerCore.ENGLISH_FREQ[j] / ceiling * 148,
+      r: 3.5, class: 'solve-dot' }));
+    const label = svgElement('text', { x: j * 14 + 7, y: j % 2 ? 210 : 182, 'text-anchor': 'middle' });
+    label.textContent = DividerCore.ALPHA[j];
+    svg.append(label);
+  }
+  return svg;
+}
+
+function updateSolveSummary() {
+  const result = DividerCore.solve(state.result.columns, solveState.shifts);
+  i18n.assign(document.getElementById('solve-key'), 'solve.key', { key: result.key });
+  i18n.assign(document.getElementById('solve-plain-label'), 'solve.plain', { count: result.plain.length });
+  document.getElementById('solve-plain').textContent = result.plain.slice(0, 300).match(/.{1,5}/g).join(' ');
+  i18n.assign(document.getElementById('solve-live'), 'solve.live', { key: result.key, start: result.plain.slice(0, 20) });
+}
+
+function renderSolveCard(column, index) {
+  const number = index + 1;
+  const card = solveElement('article', '', {}, 'solve-card');
+  card.append(solveElement('h3', 'solve.column', { number, count: column.length }));
+  const controls = solveElement('div', '', {}, 'solve-controls');
+  const previous = solveElement('button');
+  const next = solveElement('button');
+  previous.textContent = '◀';
+  next.textContent = '▶';
+  previous.setAttribute('aria-label', i18n.t('solve.previous', { number }));
+  next.setAttribute('aria-label', i18n.t('solve.next', { number }));
+  previous.type = next.type = 'button';
+  const select = solveElement('select');
+  select.setAttribute('aria-label', i18n.t('solve.shift', { number }));
+  for (let shift = 0; shift < 26; shift++) {
+    const option = solveElement('option', 'solve.option', { letter: DividerCore.ALPHA[shift], shift });
+    option.value = String(shift);
+    select.append(option);
+  }
+  const graph = solveElement('div');
+  const chi = solveElement('p');
+  const refresh = () => {
+    select.value = String(solveState.shifts[index]);
+    graph.replaceChildren(renderSolveGraph(column, solveState.shifts[index], number));
+    i18n.assign(chi, 'solve.chi', { value: DividerCore.chiSquare(column, solveState.shifts[index]).toFixed(1) });
+    updateSolveSummary();
+  };
+  const change = shift => { solveState.shifts[index] = (shift + 26) % 26; refresh(); };
+  previous.addEventListener('click', () => change(solveState.shifts[index] - 1));
+  next.addEventListener('click', () => change(solveState.shifts[index] + 1));
+  select.addEventListener('change', () => change(Number(select.value)));
+  controls.append(previous, select, next);
+  const hint = solveElement('button', 'solve.hint');
+  hint.type = 'button';
+  hint.className = 'solve-hint';
+  const hintBody = solveElement('div', '', {}, 'solve-hint-body');
+  const reveal = () => {
+    solveState.hints.add(index);
+    card.classList.add('hint-viewed');
+    const best = DividerCore.bestShift(column);
+    const apply = solveElement('button', 'solve.apply');
+    apply.type = 'button';
+    apply.addEventListener('click', () => change(best));
+    hintBody.replaceChildren(solveElement('p', 'solve.seen'), solveElement('p', 'solve.best',
+      { letter: DividerCore.ALPHA[best], value: DividerCore.chiSquare(column, best).toFixed(1) }), apply);
+    hint.setAttribute('aria-expanded', 'true');
+  };
+  hint.setAttribute('aria-expanded', 'false');
+  hintBody.id = `solve-hint-${index}`;
+  hint.setAttribute('aria-controls', hintBody.id);
+  hint.addEventListener('click', reveal);
+  if (solveState.hints.has(index)) reveal();
+  card.append(controls, graph, chi, hint, hintBody);
+  refresh();
+  return card;
+}
+
+function renderSolve() {
+  const section = document.getElementById('solve-section');
+  section.hidden = !state.result;
+  if (!state.result) return;
+  const solvable = DividerCore.isSolvable(processedText.value);
+  document.getElementById('solve-guidance').hidden = solvable;
+  document.getElementById('solve-workspace').hidden = !solvable;
+  const cards = document.getElementById('solve-cards');
+  cards.replaceChildren();
+  if (!solvable) return;
+  updateSolveSummary();
+  state.result.columns.forEach((column, index) => cards.append(renderSolveCard(column, index)));
+}
+
+document.getElementById('solve-reset').addEventListener('click', () => {
+  solveState.shifts.fill(0);
+  renderSolve();
+});
+
 // 初期処理
 updateProcessedText();
 updateSplitButtonState();
@@ -435,4 +571,5 @@ initHelpModal();
 receiveParams();
 document.addEventListener('language-changed', () => {
   updateToggleIcon(document.documentElement.dataset.theme);
+  renderSolve();
 });

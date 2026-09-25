@@ -19,7 +19,8 @@ for (const [theme, values] of [['light', light], ['dark', dark]]) {
     ['mark-text', 'card-bg'], ['link-text', 'card-bg'], ['error-text', 'card-bg'],
     ['readonly-text', 'readonly-bg'], ['button-text', 'button-light'], ['button-text', 'button-dark'],
     ['toast-text', 'toast-light'], ['toast-text', 'toast-dark'], ['text-color', 'input-bg'],
-    ['focus-ring', 'card-bg', 3], ['focus-ring', 'input-bg', 3]
+    ['focus-ring', 'card-bg', 3], ['focus-ring', 'input-bg', 3],
+    ['solve-bar', 'card-bg', 3], ['solve-dot', 'card-bg', 3]
   ]) {
     test(`${theme} ${fg} / ${bg}`, () => {
       assert.ok(values[fg] && values[bg], `${fg}, ${bg}`);

@@ -9,6 +9,18 @@ const source = fs.readFileSync(path.join(root, 'js/i18n.js'), 'utf8');
 const literal = source.match(/const messages = ([\s\S]*?);\s*let language/)[1];
 const messages = JSON.parse(JSON.stringify(vm.runInNewContext(`(${literal})`)));
 
+test('solving and sample messages exist in both languages without answer labels', () => {
+  for (const lang of ['ja', 'en']) {
+    for (const key of ['samples.label', 'samples.choose', 'samples.one', 'samples.two', 'samples.three', 'samples.load',
+      'solve.title', 'solve.guidance', 'solve.key', 'solve.plain', 'solve.reset', 'solve.column', 'solve.shift',
+      'solve.previous', 'solve.next', 'solve.chi', 'solve.hint', 'solve.seen', 'solve.best', 'solve.apply',
+      'solve.graph', 'solve.legend', 'solve.live', 'solve.option']) assert.ok(messages[lang][key], key);
+    for (const key of ['samples.one', 'samples.two', 'samples.three']) {
+      assert.doesNotMatch(messages[lang][key], /CAT|LOCK|PADLOCK/);
+    }
+  }
+});
+
 test('dictionaries have matching nonempty keys and placeholders', () => {
   assert.deepEqual(Object.keys(messages.ja).sort(), Object.keys(messages.en).sort());
   for (const key of Object.keys(messages.ja)) {
