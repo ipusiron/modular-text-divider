@@ -698,12 +698,17 @@ fieldset {
   min-width: 0;
 }
 
-button, input, select, a, [role="button"] {
+button, input:not([type="checkbox"]), select, a, [role="button"] {
   min-height: 44px;
   min-width: 44px;
 }
 
 input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
+  flex: 0 0 20px;
   vertical-align: middle;
   margin: 0;
 }
@@ -711,6 +716,12 @@ input[type="checkbox"] {
 label:has(input[type="checkbox"]) {
   display: inline-flex;
   align-items: center;
+  box-sizing: border-box;
+  min-width: 44px;
+  min-height: 44px;
+  max-width: 100%;
+  padding: 0 12px;
+  cursor: pointer;
   gap: 6px;
 }
 
