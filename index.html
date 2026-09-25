@@ -2,55 +2,65 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <script src="js/theme-init.js"></script>
+  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Modular Text Divider</title>
+  <title data-i18n="ui.0">Modular Text Divider</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <noscript data-i18n="noscript">JavaScriptを有効にしてください。<br>Please enable JavaScript.</noscript>
   <header>
     <div class="header-content">
       <div class="header-text">
-        <h1>🧩 Modular Text Divider</h1>
-        <p>テキストを指定した分割数で周期的に列分割するツールです。</p>
+        <h1><span data-i18n="ui.1">🧩 Modular Text Divider</span></h1>
+        <p><span data-i18n="ui.2">テキストを指定した分割数で周期的に列分割するツールです。</span></p>
       </div>
       <div class="header-buttons">
-        <button id="help-button" class="header-btn" title="ヘルプを表示">
-          <span class="btn-icon">❓</span>
+        <button type="button" id="language-toggle" class="header-btn" aria-label="Switch language">EN</button>
+        <button type="button" id="help-button" class="header-btn" title="ヘルプを表示" data-i18n-title="ui.79" aria-label="ヘルプを表示" data-i18n-aria-label="ui.79">
+          <span class="btn-icon"><span data-i18n="ui.3">❓</span></span>
         </button>
-        <button id="dark-mode-toggle" class="header-btn dark-mode-toggle" title="ダークモード切り替え">
-          <span class="toggle-icon">🌙</span>
+        <button type="button" id="dark-mode-toggle" class="header-btn dark-mode-toggle"
+          title="ダークモード切り替え" data-i18n-title="ui.80" aria-label="ダークモード切り替え" data-i18n-aria-label="ui.80">
+          <span class="toggle-icon"><span data-i18n="ui.4">🌙</span></span>
         </button>
       </div>
     </div>
   </header>
 
   <main>
+    <p id="url-warning" role="status" aria-live="polite"></p>
     <!-- 入力エリア -->
     <section>
-      <label for="input-text">📄 入力テキスト:</label>
-      <span id="input-char-count" class="char-count">（文字数: 0）</span><br />
-      <textarea id="input-text" rows="12" placeholder="ここに暗号文を入力してください"></textarea><br />
-      <div class="file-drop-area" id="file-drop-area">
+      <label for="input-text"><span data-i18n="ui.5">📄 入力テキスト:</span></label>
+      <span id="input-char-count" class="char-count"><span data-i18n="ui.6">（文字数: 0）</span></span><br />
+      <textarea id="input-text" rows="12" placeholder="ここに暗号文を入力してください" data-i18n-placeholder="ui.81"></textarea><br />
+      <p id="file-error" class="error-message" role="status" aria-live="polite"></p>
+      <div class="file-drop-area" id="file-drop-area" role="button" tabindex="0" aria-label="ファイルを選択" data-i18n-aria-label="ui.82">
         <input type="file" id="file-input" accept=".txt" />
         <label for="file-input">
           <div class="drop-area-content">
-            <span class="drop-icon">📁</span>
-            <span class="drop-text">ファイルをドラッグ＆ドロップ<br>または<br>クリックして選択</span>
+            <span class="drop-icon"><span data-i18n="ui.7">📁</span></span>
+            <span class="drop-text"><span data-i18n="ui.8">ファイルをドラッグ＆ドロップ</span><br><span data-i18n="ui.9">または</span><br><span data-i18n="ui.10">クリックして選択</span></span>
           </div>
         </label>
       </div>
       <div class="button-group-right">
-        <button id="load-sample">🔤 サンプル文を入力</button>
-        <button id="clear-button">🧹 クリア</button>
+        <button type="button" id="load-sample"><span data-i18n="ui.11">🔤 サンプル文を入力</span></button>
+        <button type="button" id="clear-button"><span data-i18n="ui.12">🧹 クリア</span></button>
       </div>
     </section>
 
     <!-- 分割数設定 -->
     <section class="split-control-section">
-      <label for="split-count">🔢 分割数 (n):</label>
+      <label for="split-count"><span data-i18n="ui.13">🔢 分割数 (n):</span></label>
       <div class="split-controls">
-        <input type="number" id="split-count" min="1" max="20" value="3" title="テキストを周期的に分割する列数を指定します（1～20の整数）。例: n=3の場合、1文字目→列1、2文字目→列2、3文字目→列3、4文字目→列1..." />
-        <input type="range" id="split-slider" min="1" max="20" value="3" list="tickmarks" />
+        <input type="number" id="split-count" min="1" max="20" value="3" title="テキストを周期的に分割する列数を指定します（1～20の整数）。例: n=3の場合、1文字目→列1、2文字目→列2、3文字目→列3、4文字目→列1..." data-i18n-title="ui.83" />
+        <div class="slider-track">
+        <input type="range" id="split-slider" min="1" max="20" value="3" list="tickmarks" aria-label="分割数" data-i18n-aria-label="ui.84" />
         <datalist id="tickmarks">
           <option value="1"></option>
           <option value="3"></option>
@@ -60,19 +70,16 @@
           <option value="17"></option>
           <option value="20"></option>
         </datalist>
-      </div>
       <div class="slider-labels">
-        <span class="label-1">1</span>
+        <span class="label-1"><span data-i18n="ui.14">1</span></span>
         <span></span>
-        <span class="mark label-3">3</span>
+        <span class="mark label-3"><span data-i18n="ui.15">3</span></span>
         <span></span>
-        <span class="mark label-5">5</span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span class="mark label-9">9</span>
+        <span class="mark label-5"><span data-i18n="ui.16">5</span></span>
         <span></span>
         <span></span>
+        <span></span>
+        <span class="mark label-9"><span data-i18n="ui.17">9</span></span>
         <span></span>
         <span></span>
         <span></span>
@@ -81,129 +88,139 @@
         <span></span>
         <span></span>
         <span></span>
-        <span class="label-20">20</span>
+        <span></span>
+        <span></span>
+        <span class="label-20"><span data-i18n="ui.18">20</span></span>
       </div>
-      <div id="split-error" class="error-message"></div>
+        </div>
+      </div>
+      <div id="split-error" class="error-message" role="status" aria-live="polite"></div>
     </section>
 
     <!-- オプション -->
     <section>
       <fieldset>
-        <legend>⚙️ テキスト処理オプション</legend>
-        <label><input type="checkbox" id="uppercase" /> 小文字を大文字に変換</label><br />
-        <label><input type="checkbox" id="alpha-only" /> アルファベット以外を除去</label><br />
-        <label><input type="checkbox" id="remove-spaces" /> スペースを除去</label>
+        <legend><span data-i18n="ui.19">⚙️ テキスト処理オプション</span></legend>
+        <label><input type="checkbox" id="uppercase" /> <span data-i18n="ui.20">小文字を大文字に変換</span></label><br />
+        <label><input type="checkbox" id="alpha-only" /> <span data-i18n="ui.21">アルファベット以外を除去</span></label><br />
+        <label><input type="checkbox" id="remove-spaces" /> <span data-i18n="ui.22">スペースを除去</span></label>
       </fieldset>
     </section>
 
     <!-- 処理後テキスト -->
     <section>
-      <label for="processed-text">📝 処理後のテキスト:</label>
-      <span id="processed-char-count" class="char-count">（文字数: 0）</span><br />
+      <label for="processed-text"><span data-i18n="ui.23">📝 処理後のテキスト:</span></label>
+      <span id="processed-char-count" class="char-count"><span data-i18n="ui.6">（文字数: 0）</span></span><br />
       <textarea id="processed-text" rows="4" readonly></textarea>
     </section>
 
     <!-- 列分割ボタン -->
     <section>
-      <button id="split-button">✂️ 列分割する</button>
+      <button type="button" id="split-button"><span data-i18n="ui.24">✂️ 列分割する</span></button>
     </section>
   </main>
 
   <!-- 結果表示エリア -->
-  <div id="results-container" style="display: none;">
+  <div id="results-container" hidden>
+    <p id="result-summary" role="status" aria-live="polite"></p>
     <section id="output-area"></section>
 
     <!-- エクスポート設定 -->
     <section id="export-section">
       <div class="export-controls">
-        <button id="export-csv">📥 CSVとしてエクスポート</button>
+        <button type="button" id="export-csv"><span data-i18n="ui.25">📥 CSVとしてエクスポート</span></button>
         <label class="export-option">
           <input type="checkbox" id="csv-with-index" />
-          拡張形式（元インデックス付き）でエクスポート
+          <span data-i18n="ui.26">拡張形式（元インデックス付き）でエクスポート</span>
         </label>
       </div>
     </section>
   </div>
 
   <!-- ヘルプモーダル -->
-  <div id="help-modal" class="modal">
+  <div id="help-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="help-title" hidden>
     <div class="modal-content">
       <div class="modal-header">
-        <h2>🧩 Modular Text Divider - ヘルプ</h2>
-        <button class="modal-close" id="help-modal-close">&times;</button>
+        <h2 id="help-title"><span data-i18n="ui.27">🧩 Modular Text Divider - ヘルプ</span></h2>
+        <button type="button" class="modal-close" id="help-modal-close" aria-label="ヘルプを閉じる" data-i18n-aria-label="ui.85"><span data-i18n="ui.28">&times;</span></button>
       </div>
       <div class="modal-body">
         <section>
-          <h3>📖 このツールについて</h3>
-          <p>Modular Text Dividerは、テキストを指定した分割数で周期的に列分割するツールです。主にヴィジュネル暗号などの多表式暗号の解読で使用される「列分割処理」を効率的に行うことができます。</p>
+          <h3><span data-i18n="ui.29">📖 このツールについて</span></h3>
+          <p><span data-i18n="ui.30">Modular Text Dividerは、テキストを指定した分割数で周期的に列分割するツールです。主にヴィジュネル暗号などの多表式暗号の解読で使用される「列分割処理」を効率的に行うことができます。</span></p>
         </section>
 
         <section>
-          <h3>🚀 基本的な使い方</h3>
+          <h3><span data-i18n="ui.31">🚀 基本的な使い方</span></h3>
           <ol>
-            <li><strong>テキスト入力</strong>: 上部のテキストエリアに分割したいテキストを入力するか、ファイルをドラッグ&ドロップします</li>
-            <li><strong>分割数設定</strong>: スライダーまたは数値入力で分割数（1～20）を指定します</li>
-            <li><strong>処理オプション</strong>: 必要に応じて大文字変換、英字のみ抽出、スペース除去のオプションを選択します</li>
-            <li><strong>列分割実行</strong>: 「列分割する」ボタンをクリックして処理を実行します</li>
-            <li><strong>結果確認</strong>: 各列のテキストが表示され、コピーや頻度分析への連携が可能です</li>
+            <li><strong><span data-i18n="ui.32">テキスト入力</span></strong><span data-i18n="ui.33">: 上部のテキストエリアに分割したいテキストを入力するか、ファイルをドラッグ&ドロップします</span></li>
+            <li><strong><span data-i18n="ui.34">分割数設定</span></strong><span data-i18n="ui.35">: スライダーまたは数値入力で分割数（1～20）を指定します</span></li>
+            <li><strong><span data-i18n="ui.36">処理オプション</span></strong><span data-i18n="ui.37">: 必要に応じて大文字変換、英字のみ抽出、スペース除去のオプションを選択します</span></li>
+            <li><strong><span data-i18n="ui.38">列分割実行</span></strong><span data-i18n="ui.39">: 「列分割する」ボタンをクリックして処理を実行します</span></li>
+            <li><strong><span data-i18n="ui.40">結果確認</span></strong><span data-i18n="ui.41">: 各列のテキストが表示され、コピーや頻度分析への連携が可能です</span></li>
           </ol>
         </section>
 
         <section>
-          <h3>⚙️ 機能詳細</h3>
-          <h4>📄 テキスト処理オプション</h4>
+          <h3><span data-i18n="ui.42">⚙️ 機能詳細</span></h3>
+          <h4><span data-i18n="ui.43">📄 テキスト処理オプション</span></h4>
           <ul>
-            <li><strong>小文字を大文字に変換</strong>: すべての英字を大文字に統一します</li>
-            <li><strong>アルファベット以外を除去</strong>: 英字以外の文字（数字、記号、空白など）を削除します</li>
-            <li><strong>スペースを除去</strong>: 空白文字を削除します</li>
+            <li><strong><span data-i18n="ui.20">小文字を大文字に変換</span></strong><span data-i18n="ui.44">: すべての英字を大文字に統一します</span></li>
+            <li><strong><span data-i18n="ui.21">アルファベット以外を除去</span></strong><span data-i18n="ui.45">: 英字以外の文字（数字、記号、空白など）を削除します</span></li>
+            <li><strong><span data-i18n="ui.22">スペースを除去</span></strong><span data-i18n="ui.46">: 空白文字を削除します</span></li>
           </ul>
 
-          <h4>📊 結果エリアの機能</h4>
+          <h4><span data-i18n="ui.47">📊 結果エリアの機能</span></h4>
           <ul>
-            <li><strong>📋 コピー</strong>: 各列のテキストをクリップボードにコピーします</li>
-            <li><strong>📊 頻度分析 🔗</strong>: 選択した列のテキストを頻度分析ツールで開きます（新しいタブ）</li>
-            <li><strong>📥 CSVエクスポート</strong>: 分割結果をCSV形式でダウンロードします</li>
+            <li><strong><span data-i18n="ui.48">📋 コピー</span></strong><span data-i18n="ui.49">: 各列のテキストをクリップボードにコピーします</span></li>
+            <li><strong><span data-i18n="ui.50">📊 頻度分析 🔗</span></strong><span data-i18n="ui.51">: 選択した列のテキストを頻度分析ツールで開きます（新しいタブ）</span></li>
+            <li><strong><span data-i18n="ui.52">📥 CSVエクスポート</span></strong><span data-i18n="ui.53">: 分割結果をCSV形式でダウンロードします</span></li>
           </ul>
 
-          <h4>🔗 外部ツール連携</h4>
-          <p>各列の「📊 頻度分析」ボタンをクリックすると、<a href="https://ipusiron.github.io/vigenere-cipher-tool/" target="_blank">Vigenère Cipher Tool</a>で頻度分析を行えます。5,000文字を超える場合は確認ダイアログが表示されます。</p>
+          <h4><span data-i18n="ui.54">🔗 外部ツール連携</span></h4>
+          <p><span data-i18n="ui.55">各列のリンクから</span><a href="https://ipusiron.github.io/frequency-analyzer/" target="_blank"
+            rel="noopener noreferrer"><span data-i18n="ui.56">Frequency Analyzer</span></a><span data-i18n="ui.57">を開けます。5,000文字を超える列は先頭5,000文字を送ります。</span></p>
         </section>
 
         <section>
-          <h3>🔐 ヴィジュネル暗号解読での使用例</h3>
+          <h3><span data-i18n="ui.58">🔐 ヴィジュネル暗号解読での使用例</span></h3>
           <ol>
-            <li><strong>鍵長推定</strong>: カシスキー法などで鍵長の候補を特定</li>
-            <li><strong>列分割</strong>: 本ツールで推定した鍵長に基づいてテキストを分割</li>
-            <li><strong>頻度分析</strong>: 各列に対して個別に頻度分析を実行</li>
-            <li><strong>鍵推定</strong>: 英語の文字頻度と比較して各列の鍵文字を推定</li>
-            <li><strong>復号</strong>: 推定した鍵で暗号文を復号</li>
+            <li><strong><span data-i18n="ui.59">鍵長推定</span></strong><span data-i18n="ui.60">: カシスキー法などで鍵長の候補を特定</span></li>
+            <li><strong><span data-i18n="ui.61">列分割</span></strong><span data-i18n="ui.62">: 本ツールで推定した鍵長に基づいてテキストを分割</span></li>
+            <li><strong><span data-i18n="ui.63">頻度分析</span></strong><span data-i18n="ui.64">: 各列に対して個別に頻度分析を実行</span></li>
+            <li><strong><span data-i18n="ui.65">鍵推定</span></strong><span data-i18n="ui.66">: 英語の文字頻度と比較して各列の鍵文字を推定</span></li>
+            <li><strong><span data-i18n="ui.67">復号</span></strong><span data-i18n="ui.68">: 推定した鍵で暗号文を復号</span></li>
           </ol>
         </section>
 
         <section>
-          <h3>💡 ヒント</h3>
+          <h3><span data-i18n="ui.69">💡 ヒント</span></h3>
           <ul>
-            <li>ヴィジュネル暗号の解読では、通常「アルファベット以外を除去」と「小文字を大文字に変換」を有効にします</li>
-            <li>分割数は鍵長と同じに設定します（例：鍵が「CAT」なら分割数は3）</li>
-            <li>各列の文字数が極端に少ない場合は、分割数を減らすことを検討してください</li>
-            <li>頻度分析結果で最も頻出する文字がEの場合が多いため、これを基準に鍵を推定できます</li>
+            <li><span data-i18n="ui.70">ヴィジュネル暗号の解読では、通常「アルファベット以外を除去」と「小文字を大文字に変換」を有効にします</span></li>
+            <li><span data-i18n="ui.71">分割数は鍵長と同じに設定します（例：鍵が「CAT」なら分割数は3）</span></li>
+            <li><span data-i18n="ui.72">各列の文字数が極端に少ない場合は、分割数を減らすことを検討してください</span></li>
+            <li><span data-i18n="ui.73">頻度分析結果で最も頻出する文字がEの場合が多いため、これを基準に鍵を推定できます</span></li>
           </ul>
         </section>
 
         <section>
-          <h3>🌙 ダークモード</h3>
-          <p>右上の月/太陽アイコンをクリックすることで、ライトモードとダークモードを切り替えできます。設定は自動的に保存されます。</p>
+          <h3><span data-i18n="ui.74">🌙 ダークモード</span></h3>
+          <p><span data-i18n="ui.75">右上の月/太陽アイコンをクリックすることで、ライトモードとダークモードを切り替えできます。設定は自動的に保存されます。</span></p>
         </section>
+        <p data-i18n="help.limits"></p>
       </div>
     </div>
   </div>
 
   <footer>
     <div class="footer">
-      🔗 GitHubリポジトリはこちら（ <a href="https://github.com/ipusiron/modular-text-divider" target="_blank">ipusiron/modular-text-divider</a> ）
+      <span data-i18n="ui.76">🔗 GitHubリポジトリはこちら（</span> <a href="https://github.com/ipusiron/modular-text-divider"
+        target="_blank" rel="noopener noreferrer"><span data-i18n="ui.77">ipusiron/modular-text-divider</span></a> <span data-i18n="ui.78">）</span>
     </div>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="js/divider-core.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>

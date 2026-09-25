@@ -1,5 +1,18 @@
 /* style.css - カード風＋モダンレイアウト */
 
+[hidden] {
+  display: none !important;
+}
+
+a.analyze-btn-inline {
+  display: inline-flex;
+  align-items: center;
+  background: var(--button-bg);
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
 :root {
   /* Light mode colors */
   --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -8,17 +21,26 @@
   --card-border: rgba(255, 255, 255, 0.2);
   --input-bg: #ffffff;
   --input-border: #e2e8f0;
-  --input-focus: #667eea;
+  --input-focus: #4454c9;
   --readonly-bg: #f7fafc;
   --readonly-text: #4a5568;
-  --button-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --button-light: #4c5fd5;
+  --button-dark: #5e3a86;
+  --button-text: #ffffff;
+  --button-bg: linear-gradient(135deg, var(--button-light), var(--button-dark));
   --button-disabled-bg: #e2e8f0;
   --button-disabled-text: #a0aec0;
-  --toast-bg: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  --toast-light: #276749;
+  --toast-dark: #22543d;
+  --toast-text: #ffffff;
+  --toast-bg: linear-gradient(135deg, var(--toast-light), var(--toast-dark));
   --tooltip-bg: rgba(0, 0, 0, 0.9);
-  --secondary-text: #718096;
-  --error-text: #d32f2f;
-  --char-count-text: #666;
+  --secondary-text: #5a6474;
+  --error-text: #c62828;
+  --char-count-text: #595959;
+  --mark-text: #c62828;
+  --link-text: #4454c9;
+  --focus-ring: #4454c9;
   --drop-area-bg: #f9f9f9;
   --drop-area-border: #ccc;
   --drop-area-hover-bg: #f0f8ff;
@@ -29,21 +51,22 @@
   /* Dark mode colors */
   --bg-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   --text-color: #e2e8f0;
-  --card-bg: rgba(45, 55, 72, 0.95);
+  --card-bg: #2d3748;
   --card-border: rgba(255, 255, 255, 0.1);
   --input-bg: #2d3748;
   --input-border: #4a5568;
-  --input-focus: #667eea;
+  --input-focus: #a3b1ff;
   --readonly-bg: #1a202c;
   --readonly-text: #a0aec0;
-  --button-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --button-disabled-bg: #4a5568;
   --button-disabled-text: #718096;
-  --toast-bg: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
   --tooltip-bg: rgba(0, 0, 0, 0.9);
   --secondary-text: #a0aec0;
   --error-text: #fc8181;
   --char-count-text: #a0aec0;
+  --mark-text: #ff8a80;
+  --link-text: #a3b1ff;
+  --focus-ring: #a3b1ff;
   --drop-area-bg: #2d3748;
   --drop-area-border: #4a5568;
   --drop-area-hover-bg: #374151;
@@ -72,21 +95,22 @@ main {
   background: var(--card-bg);
   border-radius: 16px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  margin: 20px;
+  margin: 20px 0;
   position: relative;
   transition: background 0.3s ease;
 }
 
 header, footer {
-  width: calc(100% - 60px);
-  max-width: 800px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 860px;
   text-align: center;
   padding: 24px 30px;
   background: var(--card-bg);
   backdrop-filter: blur(10px);
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  margin: 20px;
+  margin: 20px 0;
   transition: background 0.3s ease;
 }
 
@@ -103,19 +127,17 @@ footer {
   border-radius: 16px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   border: 1px solid var(--card-border);
-  margin: 20px;
+  margin: 20px 0;
   box-sizing: border-box;
   transition: background 0.3s ease;
 }
 
 h1 {
-  font-size: 2.2em;
+  font-size: clamp(1.35rem, 2.6vw, 2rem);
   font-weight: 700;
   margin-bottom: 0.3em;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--link-text);
+  text-align: center;
 }
 
 p {
@@ -242,7 +264,7 @@ legend {
 
 .split-controls {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
 }
 
@@ -255,6 +277,7 @@ legend {
 .split-controls input[type="range"] {
   flex: 1;
   margin-bottom: 0;
+  width: 100%;
 }
 
 .slider-labels {
@@ -262,8 +285,7 @@ legend {
   grid-template-columns: repeat(20, 1fr);
   font-size: 0.85em;
   margin-top: 5px;
-  margin-left: 90px; /* Offset to align with slider */
-  width: calc(100% - 90px); /* Match slider width */
+  width: 100%; /* Same container as the slider */
   text-align: center;
 }
 
@@ -285,7 +307,7 @@ legend {
 }
 
 .slider-labels .mark {
-  color: red;
+  color: var(--mark-text);
   font-weight: bold;
 }
 
@@ -293,7 +315,7 @@ legend {
   color: var(--error-text);
   font-size: 0.875em;
   margin-top: 5px;
-  margin-left: 90px;
+  margin-left: 0;
   min-height: 20px;
 }
 
@@ -382,6 +404,8 @@ legend {
 
 .column-header {
   display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 4px;
@@ -394,6 +418,7 @@ legend {
 
 .column-buttons {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
@@ -405,6 +430,7 @@ legend {
 
 .export-controls {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 15px;
 }
@@ -429,7 +455,10 @@ legend {
   font-weight: 500;
   z-index: 1000;
   opacity: 0;
-  transform: translateX(100%);
+  transform: translateY(-10px);
+  max-width: calc(100vw - 40px);
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
   transition: all 0.3s ease;
 }
 
@@ -440,16 +469,15 @@ legend {
 
 .toast.hide {
   opacity: 0;
-  transform: translateX(100%);
+  transform: translateY(-10px);
 }
 
 /* Tooltip styles for analyze button */
 .analyze-btn-inline:hover::after {
-  content: 'このテキストを頻度分析ツールで開きます（新しいタブで外部サイトに移動）';
+  content: attr(title);
   position: absolute;
   bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
+  right: 0;
   background: var(--tooltip-bg);
   color: white;
   padding: 8px 12px;
@@ -457,6 +485,8 @@ legend {
   font-size: 0.8em;
   z-index: 1001;
   width: 280px;
+  max-width: min(280px, 90vw);
+  box-sizing: border-box;
   text-align: center;
   line-height: 1.3;
   margin-bottom: 5px;
@@ -480,13 +510,14 @@ legend {
 /* Header layout */
 .header-content {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
   width: 100%;
 }
 
 .header-text {
-  flex: 1;
+  min-width: 0;
 }
 
 /* Header buttons */
@@ -530,7 +561,7 @@ legend {
 
 /* Modal styles */
 .modal {
-  display: none;
+  display: block;
   position: fixed;
   z-index: 2000;
   left: 0;
@@ -579,8 +610,9 @@ legend {
   cursor: pointer;
   padding: 0;
   margin: 0;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -651,6 +683,89 @@ legend {
 
 .modal-body a:hover {
   text-decoration: underline;
+}
+
+.slider-track {
+  flex: 1;
+  min-width: 0;
+}
+
+fieldset {
+  min-width: 0;
+}
+
+button, input, a, [role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+input[type="checkbox"] {
+  vertical-align: middle;
+  margin: 0;
+}
+
+label:has(input[type="checkbox"]) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+a {
+  color: var(--link-text);
+  display: inline-flex;
+  align-items: center;
+  overflow-wrap: anywhere;
+}
+
+:is(button, input, textarea, a, [role="button"]):focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+.file-drop-area:focus-within {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+.header-btn {
+  color: var(--text-color);
+  flex-shrink: 0;
+}
+
+.modal-open {
+  overflow: hidden;
+}
+
+textarea::placeholder {
+  color: var(--secondary-text);
+  opacity: 1;
+}
+
+@media (min-width: 769px) {
+  .header-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 8px;
+  }
+
+  .header-text {
+    grid-column: 2;
+    max-width: min(450px, calc(100vw - 400px));
+  }
+
+  .header-buttons {
+    grid-column: 3;
+    justify-self: end;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 .modal-body strong {

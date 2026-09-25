@@ -1,6 +1,22 @@
-// script.js
+// Application state and rendering.
 
 let lastSplitResult = null;
+const state = { raw: '', options: {}, n: '3', result: null };
+
+function invalidateResult() {
+  state.raw = inputText.value;
+  state.n = splitCount.value;
+  state.options = {
+    upper: document.getElementById('uppercase').checked,
+    alphaOnly: document.getElementById('alpha-only').checked,
+    removeSpaces: document.getElementById('remove-spaces').checked
+  };
+  state.result = null;
+  lastSplitResult = null;
+  outputArea.replaceChildren();
+  resultsContainer.hidden = true;
+  exportCsvBtn.disabled = true;
+}
 
 // UI要素の取得
 const inputText = document.getElementById("input-text");
@@ -20,43 +36,23 @@ const splitError = document.getElementById("split-error");
 
 // 文字数を更新
 function updateCharCounts() {
-  inputCharCount.textContent = `（文字数: ${inputText.value.length}）`;
-  processedCharCount.textContent = `（文字数: ${processedText.value.length}）`;
+  i18n.assign(inputCharCount, 'count', { count: Array.from(inputText.value).length });
+  i18n.assign(processedCharCount, 'count', { count: Array.from(processedText.value).length });
 }
 
 // 列分割ボタンの状態を更新
 function updateSplitButtonState() {
-  const hasText = processedText.value.trim().length > 0;
-  const hasValidCount = validateSplitCount(splitCount.value);
-  splitButton.disabled = !(hasText && hasValidCount);
+  splitButton.disabled = false;
 }
 
 function validateSplitCount(value) {
-  const val = parseFloat(value);
-  
-  // 空の場合
-  if (value === "") {
-    splitError.textContent = "分割数を入力してください";
-    return false;
-  }
-  
-  // 整数でない場合
-  if (!Number.isInteger(val)) {
-    splitError.textContent = "分割数は整数を入力してください";
-    return false;
-  }
-  
-  // 範囲外の場合
-  if (val < 1 || val > 20) {
-    splitError.textContent = "分割数は1～20の範囲で入力してください";
-    return false;
-  }
-  
-  splitError.textContent = "";
-  return true;
+  const result = DividerCore.validateN(value);
+  i18n.assign(splitError, result.ok ? '' : result.reason);
+  return result.ok;
 }
 
 splitCount.addEventListener("input", () => {
+  invalidateResult();
   const val = parseInt(splitCount.value, 10);
   
   validateSplitCount(splitCount.value);
@@ -70,6 +66,7 @@ splitCount.addEventListener("input", () => {
 
 splitSlider.addEventListener("input", () => {
   splitCount.value = splitSlider.value;
+  invalidateResult();
   validateSplitCount(splitCount.value);
   updateSplitButtonState();
 });
@@ -86,17 +83,39 @@ document.getElementById("load-sample").addEventListener("click", loadSample);
 const fileInput = document.getElementById("file-input");
 fileInput.addEventListener("change", (e) => {
   const file = e.target.files[0];
+  readFile(file);
+  fileInput.value = '';
+});
+
+function readFile(file) {
   if (!file) return;
+  const error = document.getElementById('file-error');
+  i18n.assign(error, '');
+  if (!(file.name.toLowerCase().endsWith('.txt') || file.type.startsWith('text/'))) {
+    i18n.assign(error, 'fileType');
+    return;
+  }
+  if (file.size > DividerCore.MAX_FILE_BYTES) {
+    i18n.assign(error, 'fileSize');
+    return;
+  }
   const reader = new FileReader();
   reader.onload = (e) => {
     inputText.value = e.target.result;
     updateProcessedText();
   };
+  reader.onerror = () => { i18n.assign(error, 'fileRead'); };
   reader.readAsText(file);
-});
+}
 
 // ドラッグ＆ドロップ対応
 const dropArea = document.getElementById("file-drop-area");
+dropArea.addEventListener('keydown', (event) => {
+  if (event.target === dropArea && (event.key === 'Enter' || event.key === ' ')) {
+    event.preventDefault();
+    fileInput.click();
+  }
+});
 
 dropArea.addEventListener("dragover", (e) => {
   e.preventDefault();
@@ -117,36 +136,18 @@ dropArea.addEventListener("drop", (e) => {
   
   const files = e.dataTransfer.files;
   if (files.length > 0) {
-    const file = files[0];
-    if (file.type === "text/plain" || file.name.endsWith(".txt")) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        inputText.value = e.target.result;
-        updateProcessedText();
-      };
-      reader.readAsText(file);
-    } else {
-      alert("テキストファイル（.txt）のみ対応しています。");
-    }
+    readFile(files[0]);
   }
 });
 
 // テキスト処理
 function preprocessText(raw) {
-  let text = raw;
-  if (document.getElementById("uppercase").checked) {
-    text = text.toUpperCase();
-  }
-  if (document.getElementById("alpha-only").checked) {
-    text = text.replace(/[^A-Z]/gi, "");
-  }
-  if (document.getElementById("remove-spaces").checked) {
-    text = text.replace(/\s+/g, "");
-  }
-  return text;
+  return DividerCore.preprocess(raw, state.options);
 }
 
 function updateProcessedText() {
+  invalidateResult();
+  i18n.assign(splitError, '');
   const raw = inputText.value;
   processedText.value = preprocessText(raw);
   updateCharCounts();
@@ -165,31 +166,27 @@ const clearBtn = document.getElementById("clear-button");
 clearBtn.addEventListener("click", () => {
   inputText.value = "";
   processedText.value = "";
-  outputArea.innerHTML = "";
+  outputArea.replaceChildren();
   exportCsvBtn.disabled = true;
-  resultsContainer.style.display = "none";
+  resultsContainer.hidden = true;
   lastSplitResult = null;
+  updateProcessedText();
   updateCharCounts();
   updateSplitButtonState();
 });
 
 // 列分割処理
 function splitIntoColumns(text, n) {
-  const columns = Array.from({ length: n }, () => []);
-  const withIndex = [];
-  for (let i = 0; i < text.length; i++) {
-    const col = i % n;
-    columns[col].push(text[i]);
-    withIndex.push({ index: i + 1, col, char: text[i] });
-  }
-  lastSplitResult = { columns, withIndex };
-  renderColumnOutputs(columns);
+  state.result = DividerCore.split(text, n);
+  lastSplitResult = state.result;
+  renderColumnOutputs(state.result.columns);
   exportCsvBtn.disabled = false;
-  resultsContainer.style.display = "block";
+  resultsContainer.hidden = false;
+  i18n.assign(document.getElementById('result-summary'), 'splitDone', { count: n });
 }
 
 function renderColumnOutputs(columns) {
-  outputArea.innerHTML = "";
+  outputArea.replaceChildren();
   columns.forEach((col, i) => {
     const wrapper = document.createElement("div");
     wrapper.className = "output-column";
@@ -198,35 +195,41 @@ function renderColumnOutputs(columns) {
     headerDiv.className = "column-header";
 
     const countLabel = document.createElement("p");
-    countLabel.textContent = `📏 Column ${i + 1}（文字数: ${col.length}）`;
+    i18n.assign(countLabel, 'column', { number: i + 1, count: Array.from(col).length });
+    countLabel.id = `column-label-${i}`;
 
     const buttonGroup = document.createElement("div");
     buttonGroup.className = "column-buttons";
 
     const copyBtn = document.createElement("button");
-    copyBtn.textContent = "📋 コピー";
+    copyBtn.type = 'button';
+    i18n.assign(copyBtn, 'ui.48');
     copyBtn.className = "copy-btn-inline";
-    copyBtn.onclick = async () => {
+    copyBtn.addEventListener('click', async () => {
       try {
-        await navigator.clipboard.writeText(col.join(""));
-        showToast(`📋 Column ${i + 1} をクリップボードにコピーしました`);
+        await navigator.clipboard.writeText(col);
+        showToast('copied', { number: i + 1 });
       } catch (err) {
-        console.error('Failed to copy: ', err);
-        showToast('❌ コピーに失敗しました');
+        showToast('copyFailed');
       }
-    };
+    });
 
-    const analyzeBtn = document.createElement("button");
-    analyzeBtn.textContent = "📊 頻度分析 🔗";
+    const analyzeBtn = document.createElement("a");
+    const truncated = Array.from(col).length > 5000;
+    i18n.assign(analyzeBtn, truncated ? 'analyzeLong' : 'analyze');
     analyzeBtn.className = "analyze-btn-inline";
-    analyzeBtn.onclick = () => {
-      sendToFrequencyAnalyzer(col.join(""));
-    };
+    analyzeBtn.href = 'https://ipusiron.github.io/frequency-analyzer/?text=' +
+      encodeURIComponent(Array.from(col).slice(0, 5000).join(''));
+    analyzeBtn.target = '_blank';
+    analyzeBtn.rel = 'noopener noreferrer';
+    analyzeBtn.title = i18n.t('analyzeTitle');
+    analyzeBtn.setAttribute('data-i18n-title', 'analyzeTitle');
 
     const textarea = document.createElement("textarea");
     textarea.rows = 3;
     textarea.readOnly = true;
-    textarea.value = col.join("");
+    textarea.value = col;
+    textarea.setAttribute('aria-labelledby', countLabel.id);
 
     buttonGroup.appendChild(copyBtn);
     buttonGroup.appendChild(analyzeBtn);
@@ -238,7 +241,7 @@ function renderColumnOutputs(columns) {
   });
 }
 
-document.getElementById("split-button").addEventListener("click", () => {
+function performSplit() {
   const clean = processedText.value;
   
   // バリデーションチェック
@@ -248,36 +251,23 @@ document.getElementById("split-button").addEventListener("click", () => {
   
   const n = parseInt(splitCount.value, 10);
   if (clean.length === 0) {
-    alert("テキストを入力してください。");
+    i18n.assign(splitError, 'noText');
     return;
   }
-  if (n > clean.length) {
-    alert(`分割数がテキスト長（${clean.length}文字）を超えています。`);
+  const validation = DividerCore.validateN(splitCount.value, Array.from(clean).length);
+  if (!validation.ok) {
+    i18n.assign(splitError, 'tooLarge', { length: validation.length });
     return;
   }
   splitIntoColumns(clean, n);
-});
+}
+document.getElementById('split-button').addEventListener('click', performSplit);
 
 // CSVエクスポート
 function exportCSV() {
   if (!lastSplitResult) return;
   const useIndex = document.getElementById("csv-with-index").checked;
-  let csv = "";
-
-  if (!useIndex) {
-    const maxLen = Math.max(...lastSplitResult.columns.map(c => c.length));
-    csv += lastSplitResult.columns.map((_, i) => `Column ${i + 1}`).join(",") + "\n";
-    for (let i = 0; i < maxLen; i++) {
-      csv += lastSplitResult.columns.map(col => col[i] || "").join(",") + "\n";
-    }
-  } else {
-    csv += "Index" + lastSplitResult.columns.map((_, i) => `,Column ${i + 1}`).join("") + "\n";
-    lastSplitResult.withIndex.forEach(({ index, col, char }) => {
-      const row = Array(lastSplitResult.columns.length).fill("");
-      row[col] = char;
-      csv += `${index},${row.join(",")}\n`;
-    });
-  }
+  const csv = DividerCore.toCsv(lastSplitResult, useIndex);
 
   // 現在の日時をファイル名に含める
   const now = new Date();
@@ -302,7 +292,7 @@ function exportCSV() {
 document.getElementById("export-csv").addEventListener("click", exportCSV);
 
 // トースト通知
-function showToast(message, duration = 3000) {
+function showToast(key, values = {}, duration = 3000) {
   // 既存のトーストがあれば削除
   const existingToast = document.querySelector('.toast');
   if (existingToast) {
@@ -312,7 +302,9 @@ function showToast(message, duration = 3000) {
   // 新しいトーストを作成
   const toast = document.createElement('div');
   toast.className = 'toast';
-  toast.textContent = message;
+  toast.setAttribute('role', 'status');
+  toast.setAttribute('aria-live', 'polite');
+  i18n.assign(toast, key, values);
   document.body.appendChild(toast);
 
   // アニメーション開始
@@ -331,31 +323,35 @@ function showToast(message, duration = 3000) {
   }, duration);
 }
 
-// 頻度分析ツールへの連携
-function sendToFrequencyAnalyzer(text) {
-  const maxLength = 5000; // GETパラメーターの実用的な制限
-  
-  if (text.length > maxLength) {
-    if (confirm(`テキストが${maxLength}文字を超えています（${text.length}文字）。\n先頭${maxLength}文字のみ送信しますか？`)) {
-      text = text.substring(0, maxLength);
-    } else {
-      return;
-    }
+// Consume hand-off parameters without retaining ciphertext in the address bar.
+function receiveParams() {
+  const params = DividerCore.readParams(location.search);
+  if (params.text !== null) {
+    inputText.value = params.text;
+    ['uppercase', 'alpha-only', 'remove-spaces'].forEach(id => { document.getElementById(id).checked = true; });
   }
-  
-  const encodedText = encodeURIComponent(text);
-  const url = `https://ipusiron.github.io/frequency-analyzer/?text=${encodedText}`;
-  window.open(url, '_blank');
+  if (params.n !== null) splitCount.value = splitSlider.value = String(params.n);
+  updateProcessedText();
+  const warning = document.getElementById('url-warning');
+  warning.replaceChildren();
+  params.warnings.forEach(key => {
+    const item = document.createElement('span');
+    i18n.assign(item, key);
+    warning.append(item, document.createTextNode(' '));
+  });
+  if (params.text !== null && params.n !== null) performSplit();
+  const url = new URL(location.href);
+  url.searchParams.delete('text');
+  url.searchParams.delete('n');
+  try { history.replaceState(null, '', url); } catch { /* file origins can deny history changes. */ }
 }
 
 // ダークモード切り替え機能
 function initDarkMode() {
   const darkModeToggle = document.getElementById('dark-mode-toggle');
-  const toggleIcon = darkModeToggle.querySelector('.toggle-icon');
   
   // ローカルストレージから設定を読み込み
-  const savedTheme = localStorage.getItem('theme') || 'light';
-  document.documentElement.setAttribute('data-theme', savedTheme);
+  const savedTheme = document.documentElement.dataset.theme;
   
   // アイコンを更新
   updateToggleIcon(savedTheme);
@@ -366,11 +362,11 @@ function initDarkMode() {
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
     
     document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
+    try { localStorage.setItem('theme', newTheme); } catch { /* Storage is optional. */ }
     updateToggleIcon(newTheme);
     
     // トースト通知
-    showToast(`${newTheme === 'dark' ? '🌙 ダークモード' : '☀️ ライトモード'}に切り替えました`);
+    showToast(newTheme === 'dark' ? 'theme.dark' : 'theme.light');
   });
 }
 
@@ -384,32 +380,49 @@ function initHelpModal() {
   const helpButton = document.getElementById('help-button');
   const helpModal = document.getElementById('help-modal');
   const helpModalClose = document.getElementById('help-modal-close');
+  const siblings = [...document.body.children].filter(el => el !== helpModal && el.tagName !== 'SCRIPT');
+  const close = () => {
+    helpModal.hidden = true;
+    document.body.classList.remove('modal-open');
+    siblings.forEach(el => { el.inert = false; });
+    helpButton.focus();
+  };
   
   // ヘルプボタンクリック
   helpButton.addEventListener('click', () => {
-    helpModal.style.display = 'block';
-    document.body.style.overflow = 'hidden'; // 背景スクロール無効化
+    helpModal.hidden = false;
+    document.body.classList.add('modal-open');
+    siblings.forEach(el => { el.inert = true; });
+    helpModalClose.focus();
   });
   
   // 閉じるボタンクリック
   helpModalClose.addEventListener('click', () => {
-    helpModal.style.display = 'none';
-    document.body.style.overflow = 'auto'; // 背景スクロール復活
+    close();
   });
   
   // モーダル外クリックで閉じる
   helpModal.addEventListener('click', (e) => {
     if (e.target === helpModal) {
-      helpModal.style.display = 'none';
-      document.body.style.overflow = 'auto';
+      close();
     }
   });
   
   // Escキーで閉じる
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && helpModal.style.display === 'block') {
-      helpModal.style.display = 'none';
-      document.body.style.overflow = 'auto';
+    if (helpModal.hidden) return;
+    if (e.key === 'Escape') close();
+    if (e.key === 'Tab') {
+      const items = [...helpModal.querySelectorAll('button, a[href], input, [tabindex="0"]')];
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     }
   });
 }
@@ -419,3 +432,7 @@ updateProcessedText();
 updateSplitButtonState();
 initDarkMode();
 initHelpModal();
+receiveParams();
+document.addEventListener('language-changed', () => {
+  updateToggleIcon(document.documentElement.dataset.theme);
+});
