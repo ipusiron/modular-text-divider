@@ -6,11 +6,13 @@ const path = require('node:path');
 const root = path.join(__dirname, '..');
 
 test('new JavaScript and tests stay readable', () => {
-  const files = ['js/divider-core.js', ...fs.readdirSync(__dirname).filter(f => f.endsWith('.js')).map(f => `test/${f}`)];
+  const files = ['style.css', ...fs.readdirSync(path.join(root, 'js')).map(f => `js/${f}`),
+    ...fs.readdirSync(__dirname).filter(f => f.endsWith('.js')).map(f => `test/${f}`)];
   for (const file of files) {
     const lines = fs.readFileSync(path.join(root, file), 'utf8').split('\n');
     assert.ok(Math.max(...lines.map(l => l.length)) <= 160, file);
   }
+  assert.ok(Math.max(...fs.readFileSync(path.join(root, 'index.html'), 'utf8').split('\n').map(l => l.length)) <= 250);
 });
 
 test('source line count floors', () => {

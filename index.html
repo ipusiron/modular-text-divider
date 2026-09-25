@@ -2,11 +2,16 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <script src="js/theme-init.js"></script>
+  <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Modular Text Divider</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <noscript>JavaScriptを有効にしてください。<br>Please enable JavaScript.</noscript>
   <header>
     <div class="header-content">
       <div class="header-text">
@@ -14,10 +19,11 @@
         <p>テキストを指定した分割数で周期的に列分割するツールです。</p>
       </div>
       <div class="header-buttons">
-        <button id="help-button" class="header-btn" title="ヘルプを表示">
+        <button type="button" id="help-button" class="header-btn" title="ヘルプを表示" aria-label="ヘルプを表示">
           <span class="btn-icon">❓</span>
         </button>
-        <button id="dark-mode-toggle" class="header-btn dark-mode-toggle" title="ダークモード切り替え">
+        <button type="button" id="dark-mode-toggle" class="header-btn dark-mode-toggle"
+          title="ダークモード切り替え" aria-label="ダークモード切り替え">
           <span class="toggle-icon">🌙</span>
         </button>
       </div>
@@ -42,8 +48,8 @@
         </label>
       </div>
       <div class="button-group-right">
-        <button id="load-sample">🔤 サンプル文を入力</button>
-        <button id="clear-button">🧹 クリア</button>
+        <button type="button" id="load-sample">🔤 サンプル文を入力</button>
+        <button type="button" id="clear-button">🧹 クリア</button>
       </div>
     </section>
 
@@ -52,7 +58,8 @@
       <label for="split-count">🔢 分割数 (n):</label>
       <div class="split-controls">
         <input type="number" id="split-count" min="1" max="20" value="3" title="テキストを周期的に分割する列数を指定します（1～20の整数）。例: n=3の場合、1文字目→列1、2文字目→列2、3文字目→列3、4文字目→列1..." />
-        <input type="range" id="split-slider" min="1" max="20" value="3" list="tickmarks" />
+        <div class="slider-track">
+        <input type="range" id="split-slider" min="1" max="20" value="3" list="tickmarks" aria-label="分割数" />
         <datalist id="tickmarks">
           <option value="1"></option>
           <option value="3"></option>
@@ -62,7 +69,6 @@
           <option value="17"></option>
           <option value="20"></option>
         </datalist>
-      </div>
       <div class="slider-labels">
         <span class="label-1">1</span>
         <span></span>
@@ -85,7 +91,9 @@
         <span></span>
         <span class="label-20">20</span>
       </div>
-      <div id="split-error" class="error-message"></div>
+        </div>
+      </div>
+      <div id="split-error" class="error-message" role="status" aria-live="polite"></div>
     </section>
 
     <!-- オプション -->
@@ -107,18 +115,19 @@
 
     <!-- 列分割ボタン -->
     <section>
-      <button id="split-button">✂️ 列分割する</button>
+      <button type="button" id="split-button">✂️ 列分割する</button>
     </section>
   </main>
 
   <!-- 結果表示エリア -->
   <div id="results-container" hidden>
+    <p id="result-summary" role="status" aria-live="polite"></p>
     <section id="output-area"></section>
 
     <!-- エクスポート設定 -->
     <section id="export-section">
       <div class="export-controls">
-        <button id="export-csv">📥 CSVとしてエクスポート</button>
+        <button type="button" id="export-csv">📥 CSVとしてエクスポート</button>
         <label class="export-option">
           <input type="checkbox" id="csv-with-index" />
           拡張形式（元インデックス付き）でエクスポート
@@ -128,11 +137,11 @@
   </div>
 
   <!-- ヘルプモーダル -->
-  <div id="help-modal" class="modal">
+  <div id="help-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="help-title" hidden>
     <div class="modal-content">
       <div class="modal-header">
-        <h2>🧩 Modular Text Divider - ヘルプ</h2>
-        <button class="modal-close" id="help-modal-close">&times;</button>
+        <h2 id="help-title">🧩 Modular Text Divider - ヘルプ</h2>
+        <button type="button" class="modal-close" id="help-modal-close" aria-label="ヘルプを閉じる">&times;</button>
       </div>
       <div class="modal-body">
         <section>
@@ -168,7 +177,8 @@
           </ul>
 
           <h4>🔗 外部ツール連携</h4>
-          <p>各列の「📊 頻度分析」ボタンをクリックすると、<a href="https://ipusiron.github.io/vigenere-cipher-tool/" target="_blank">Vigenère Cipher Tool</a>で頻度分析を行えます。5,000文字を超える場合は確認ダイアログが表示されます。</p>
+          <p>各列のリンクから<a href="https://ipusiron.github.io/frequency-analyzer/" target="_blank"
+            rel="noopener noreferrer">Frequency Analyzer</a>を開けます。5,000文字を超える列は先頭5,000文字を送ります。</p>
         </section>
 
         <section>
@@ -202,7 +212,8 @@
 
   <footer>
     <div class="footer">
-      🔗 GitHubリポジトリはこちら（ <a href="https://github.com/ipusiron/modular-text-divider" target="_blank">ipusiron/modular-text-divider</a> ）
+      🔗 GitHubリポジトリはこちら（ <a href="https://github.com/ipusiron/modular-text-divider"
+        target="_blank" rel="noopener noreferrer">ipusiron/modular-text-divider</a> ）
     </div>
   </footer>
 

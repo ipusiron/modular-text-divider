@@ -187,6 +187,7 @@ function splitIntoColumns(text, n) {
   renderColumnOutputs(state.result.columns);
   exportCsvBtn.disabled = false;
   resultsContainer.hidden = false;
+  document.getElementById('result-summary').textContent = `${n}列に分割しました`;
 }
 
 function renderColumnOutputs(columns) {
@@ -225,6 +226,7 @@ function renderColumnOutputs(columns) {
       encodeURIComponent(Array.from(col).slice(0, 5000).join(''));
     analyzeBtn.target = '_blank';
     analyzeBtn.rel = 'noopener noreferrer';
+    analyzeBtn.title = 'このテキストを頻度分析ツールで開きます（新しいタブで外部サイトに移動）';
 
     const textarea = document.createElement("textarea");
     textarea.rows = 3;
@@ -348,11 +350,9 @@ function receiveParams() {
 // ダークモード切り替え機能
 function initDarkMode() {
   const darkModeToggle = document.getElementById('dark-mode-toggle');
-  const toggleIcon = darkModeToggle.querySelector('.toggle-icon');
   
   // ローカルストレージから設定を読み込み
-  const savedTheme = localStorage.getItem('theme') || 'light';
-  document.documentElement.setAttribute('data-theme', savedTheme);
+  const savedTheme = document.documentElement.dataset.theme;
   
   // アイコンを更新
   updateToggleIcon(savedTheme);
@@ -363,7 +363,7 @@ function initDarkMode() {
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
     
     document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
+    try { localStorage.setItem('theme', newTheme); } catch { /* Storage is optional. */ }
     updateToggleIcon(newTheme);
     
     // トースト通知
@@ -381,32 +381,49 @@ function initHelpModal() {
   const helpButton = document.getElementById('help-button');
   const helpModal = document.getElementById('help-modal');
   const helpModalClose = document.getElementById('help-modal-close');
+  const siblings = [...document.body.children].filter(el => el !== helpModal && el.tagName !== 'SCRIPT');
+  const close = () => {
+    helpModal.hidden = true;
+    document.body.classList.remove('modal-open');
+    siblings.forEach(el => { el.inert = false; });
+    helpButton.focus();
+  };
   
   // ヘルプボタンクリック
   helpButton.addEventListener('click', () => {
-    helpModal.style.display = 'block';
-    document.body.style.overflow = 'hidden'; // 背景スクロール無効化
+    helpModal.hidden = false;
+    document.body.classList.add('modal-open');
+    siblings.forEach(el => { el.inert = true; });
+    helpModalClose.focus();
   });
   
   // 閉じるボタンクリック
   helpModalClose.addEventListener('click', () => {
-    helpModal.style.display = 'none';
-    document.body.style.overflow = 'auto'; // 背景スクロール復活
+    close();
   });
   
   // モーダル外クリックで閉じる
   helpModal.addEventListener('click', (e) => {
     if (e.target === helpModal) {
-      helpModal.style.display = 'none';
-      document.body.style.overflow = 'auto';
+      close();
     }
   });
   
   // Escキーで閉じる
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && helpModal.style.display === 'block') {
-      helpModal.style.display = 'none';
-      document.body.style.overflow = 'auto';
+    if (helpModal.hidden) return;
+    if (e.key === 'Escape') close();
+    if (e.key === 'Tab') {
+      const items = [...helpModal.querySelectorAll('button, a[href], input, [tabindex="0"]')];
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     }
   });
 }
