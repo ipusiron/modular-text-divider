@@ -142,7 +142,9 @@ const i18n = (() => {
     "badN": "URLの分割数は1～20の整数にしてください",
     "theme.dark": "🌙 ダークモードに切り替えました",
     "theme.light": "☀️ ライトモードに切り替えました",
-    "help.limits": "?text=…&n=…で受け取ると前処理をすべてオンにし、両方が有効なら分割します。URLは10,000文字、分割数は1～20、ファイルは1 MBまでです。読込後にtextとnをURLから消します。入力や設定を変えると結果を隠します。文字数はコードポイント単位です。",
+    "help.limits": "#text=…&n=…（または?text=…&n=…）で受け取ると前処理をすべてオンにし、両方が有効なら分割します。" +
+      "「#」より後ろはサーバーへ送られません。URLは10,000文字、分割数は1～20、ファイルは1 MBまでです。" +
+      "読込後にtextとnをURLから消します。入力や設定を変えると結果を隠します。文字数はコードポイント単位です。",
   },
   en: {
     "help.solve": "When the processed text contains only A–Z, adjust each column with the arrows or selector and compare bars with English-frequency dots. " +
@@ -289,7 +291,8 @@ const i18n = (() => {
     "theme.dark": "🌙 Switched to dark mode.",
     "theme.light": "☀️ Switched to light mode.",
     "help.limits": 
-      "Receive text and n through ?text=…&n=…; all preprocessing is enabled, and valid pairs split " +
+      "Receive text and n through #text=…&n=… (or ?text=…&n=…; the part after # is not sent to the server); " +
+      "all preprocessing is enabled, and valid pairs split " +
       "automatically. Limits: 10,000 URL characters, 1–20 columns, and 1 MB per file. Text and n are " +
       "removed from the URL after loading. Editing inputs or settings clears results. Characters are " +
       "counted by code point.",
