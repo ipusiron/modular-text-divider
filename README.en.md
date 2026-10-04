@@ -161,7 +161,7 @@ Day030 treats each column as a Caesar cipher shifted by one key letter, letting 
 ### 1. Estimate the key length with the Kasiski examination
 
 Measure distances between repeated sequences to identify candidate key lengths.
-Day028 [RepeatSeq Analyzer](https://ipusiron.github.io/repeatseq-analyzer/) can pass ciphertext and an estimated key length of at most 20 using `?text=…&n=…` (or `#text=…&n=…`).
+Day028 [RepeatSeq Analyzer](https://ipusiron.github.io/repeatseq-analyzer/) can pass ciphertext and an estimated key length of at most 20 using `#text=…&n=…`.
 
 ### 2. 🎯 Split into columns (this tool's role)
 

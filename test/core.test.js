@@ -197,3 +197,10 @@ test('200 seeded Unicode round trips for every n=1..20, including CSV', () => {
     }
   }
 });
+
+test('help and favicon: help names #text= first, and a data: favicon stops the /favicon.ico request', () => {
+  const i18n = fs.readFileSync(path.join(__dirname, '..', 'js', 'i18n.js'), 'utf8');
+  assert.ok(i18n.includes('"help.limits": "#text=…&n=…（または?text=…&n=…）で受け取ると'));
+  assert.ok(i18n.includes('"Receive text and n through #text=…&n=…'));
+  assert.ok(fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8').includes('<link rel="icon" href="data:,">'));
+});

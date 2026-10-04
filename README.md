@@ -193,7 +193,7 @@ Day028 RepeatSeq Analyzerは列ごとのカイ二乗から鍵を自動推定し�
 Day030では、各列を同じ鍵の文字でずらされたシーザー暗号として扱い、頻度の形を見ながら手でシフトを合わせます。
 
 ### 1. **カシスキー法による鍵長特定**
-暗号文中の同じ文字列の出現間隔を測定し、鍵長の候補を絞り込む。Day028 [RepeatSeq Analyzer](https://ipusiron.github.io/repeatseq-analyzer/)で推定した鍵長（20以下）と暗号文を`?text=…&n=…`（または`#text=…&n=…`）で本ツールへ渡す
+暗号文中の同じ文字列の出現間隔を測定し、鍵長の候補を絞り込む。Day028 [RepeatSeq Analyzer](https://ipusiron.github.io/repeatseq-analyzer/)で推定した鍵長（20以下）と暗号文を`#text=…&n=…`で本ツールへ渡す
 
 ### 2. **🎯 列分割（本ツールの役割）**
 特定した鍵長で暗号文を周期的に分割し、各列を独立した単一換字暗号として扱う
