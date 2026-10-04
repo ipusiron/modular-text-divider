@@ -125,6 +125,23 @@ for (const [search, expected] of [
   test(`URL ${search.slice(0, 35)}`, () => assert.deepEqual(core.readParams(search), expected));
 }
 
+test('URL: #text= wins over ?text=, and n comes from the same place', () => {
+  assert.deepEqual(core.readParams('?text=QUERY&n=3', '#text=HASH&n=5'), { text: 'HASH', n: 5, warnings: [] });
+  assert.deepEqual(core.readParams('?text=QUERY&n=3', ''), { text: 'QUERY', n: 3, warnings: [] });
+  assert.deepEqual(core.readParams('', '#text=' + 'A'.repeat(10000) + '&n=20'), { text: 'A'.repeat(10000), n: 20, warnings: [] });
+  assert.deepEqual(core.readParams('', '#text=' + 'A'.repeat(10001)), { text: null, n: null, warnings: ['textTooLong'] });
+  assert.deepEqual(core.readParams('?lang=en', '#top'), { text: null, n: null, warnings: [] });
+});
+
+test('URL: text and n are removed from both ? and # after loading (lang and other values stay)', () => {
+  const base = 'https://ipusiron.github.io/modular-text-divider/';
+  assert.equal(core.urlWithoutHandoff(base + '?text=ABC&n=3&lang=en'), '/modular-text-divider/?lang=en');
+  assert.equal(core.urlWithoutHandoff(base + '?lang=en#text=ABC&n=3'), '/modular-text-divider/?lang=en');
+  assert.equal(core.urlWithoutHandoff(base + '#text=ABC&x=1'), '/modular-text-divider/#x=1');
+  assert.equal(core.urlWithoutHandoff(base + '?n=3#top'), '/modular-text-divider/#top');
+  assert.equal(core.urlWithoutHandoff(base + '?lang=en#top'), null);
+});
+
 for (const [sample, n, length, lengths, starts] of [
   ['vigenere1', 3, 614, [205, 205, 204], ['YPCKJYVQ', 'HIPLEESW', 'XGKMLXAX']],
   ['vigenere2', 4, 1146, [287, 287, 286, 286], ['QDPDYCZQ', 'CQOSMGCO', 'WQPXGCWV', 'BBNOKQBR']],

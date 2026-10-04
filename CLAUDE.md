@@ -114,10 +114,10 @@ Local Claude Code commands remain in the ignored, untracked `.claude/commands/` 
 
 This tool is designed to work with other tools in the series, particularly:
 - **Frequency Analyzer** - Analyze individual columns for letter frequencies (https://ipusiron.github.io/frequency-analyzer/)
-- Outgoing integration uses `?text=` with URL-encoded text, limited to 5,000 code points.
-- Incoming `?text=...&n=...` supports Day028 RepeatSeq Analyzer: text ≤10,000 code points, n an integer 1–20.
+- Outgoing integration uses `#text=` with URL-encoded text (not sent to the server), limited to 5,000 code points.
+- Incoming `#text=...&n=...` (preferred; GitHub Pages rejects a path+query over 8,192 bytes with 414) or `?text=...&n=...`: text ≤10,000 code points, n an integer 1–20. `#` wins when both are present.
 - Receiving text enables all three preprocessing options; valid text/n pairs split automatically.
-- Invalid values produce localized warnings. Remove text and n with history.replaceState after loading, preserving lang.
+- Invalid values produce localized warnings. Remove text and n from both `?` and `#` with history.replaceState after loading (`urlWithoutHandoff`), preserving lang.
 - Files must be .txt or text/* and at most 1 MB (1,048,576 bytes). Clear the file input after selection for reselection.
 
 ## Localization and Storage

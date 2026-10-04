@@ -76,7 +76,7 @@ Preprocessing, Unicode-aware splitting, CSV export, and URL input run entirely i
 - **Column output**: Separate read-only text areas
 - **📋 Copy**: Copy a column to the clipboard
 - **📊 Frequency analysis**: Open the column in an external frequency analyzer in a new tab
-- **URL input**: Receive ciphertext and a key length from Day028 using `?text=…&n=…`
+- **URL input**: Receive ciphertext and a key length using `#text=…&n=…` (recommended) or `?text=…&n=…` (from Day028, Day044 and Day047)
 
 ### 🧮 Solve by Hand
 
@@ -161,7 +161,7 @@ Day030 treats each column as a Caesar cipher shifted by one key letter, letting 
 ### 1. Estimate the key length with the Kasiski examination
 
 Measure distances between repeated sequences to identify candidate key lengths.
-Day028 [RepeatSeq Analyzer](https://ipusiron.github.io/repeatseq-analyzer/) can pass ciphertext and an estimated key length of at most 20 using `?text=…&n=…`.
+Day028 [RepeatSeq Analyzer](https://ipusiron.github.io/repeatseq-analyzer/) can pass ciphertext and an estimated key length of at most 20 using `?text=…&n=…` (or `#text=…&n=…`).
 
 ### 2. 🎯 Split into columns (this tool's role)
 
@@ -246,11 +246,14 @@ and send only that prefix. There is no confirmation dialog. You can also copy an
 ### GET parameters
 
 ```text
-https://ipusiron.github.io/frequency-analyzer/?text=HELLO%20WORLD
+https://ipusiron.github.io/frequency-analyzer/#text=HELLO%20WORLD
+https://ipusiron.github.io/modular-text-divider/#text=LXFOPVEFRNHRLXFOPVEFRNHR&n=3
 https://ipusiron.github.io/modular-text-divider/?text=LXFOPVEFRNHRLXFOPVEFRNHR&n=3
 ```
 
-Day028 RepeatSeq Analyzer can supply ciphertext and an estimated key length through text and n.
+Day028 RepeatSeq Analyzer and other tools can supply ciphertext and an estimated key length through text and n, either after `#` (recommended) or after `?`. If both are present, `#` wins.
+The part after `#` is not sent to the server, so the ciphertext does not reach GitHub Pages and is not subject to the URL length limit (GitHub Pages accepts up to 8,192 bytes for the path and the part after `?`). Passing 10,000 characters with `?` exceeds that limit and ends on an error page.
+After loading, text and n are removed from both `#` and `?` in the URL. “📊 Open frequency analysis” also passes the column with `#text=`.
 The maximum key length accepted here is 20. Use `?lang=ja` or `?lang=en` to select a language.
 
 **Privacy**: URLs contain the supplied text and may remain in browser history or at a sharing destination.

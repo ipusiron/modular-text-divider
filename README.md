@@ -109,7 +109,7 @@ English: [README.en.md](README.en.md)
 - **各列表示**: 分割結果を列ごとに整理して表示
 - **📋 コピー機能**: 各列のテキストをワンクリックでクリップボードにコピー
 - **📊 頻度分析連携**: 各列のテキストを外部の頻度分析ツールで開く（新しいタブ）
-- **URL受け取り**: Day028から`?text=…&n=…`で暗号文と鍵長を受け取り
+- **URL受け取り**: `#text=…&n=…`（推奨）または`?text=…&n=…`で暗号文と鍵長を受け取り（Day028・Day044・Day047から）
 
 ### 🧮 手で解く
 
@@ -193,7 +193,7 @@ Day028 RepeatSeq Analyzerは列ごとのカイ二乗から鍵を自動推定し�
 Day030では、各列を同じ鍵の文字でずらされたシーザー暗号として扱い、頻度の形を見ながら手でシフトを合わせます。
 
 ### 1. **カシスキー法による鍵長特定**
-暗号文中の同じ文字列の出現間隔を測定し、鍵長の候補を絞り込む。Day028 [RepeatSeq Analyzer](https://ipusiron.github.io/repeatseq-analyzer/)で推定した鍵長（20以下）と暗号文を`?text=…&n=…`で本ツールへ渡す
+暗号文中の同じ文字列の出現間隔を測定し、鍵長の候補を絞り込む。Day028 [RepeatSeq Analyzer](https://ipusiron.github.io/repeatseq-analyzer/)で推定した鍵長（20以下）と暗号文を`?text=…&n=…`（または`#text=…&n=…`）で本ツールへ渡す
 
 ### 2. **🎯 列分割（本ツールの役割）**
 特定した鍵長で暗号文を周期的に分割し、各列を独立した単一換字暗号として扱う
@@ -273,11 +273,14 @@ A=0～Z=25として、列の暗号文字cをシフトsで戻す式は`p = (c - s
 ### GETパラメーター仕様
 
 ```text
-https://ipusiron.github.io/frequency-analyzer/?text=HELLO%20WORLD
+https://ipusiron.github.io/frequency-analyzer/#text=HELLO%20WORLD
+https://ipusiron.github.io/modular-text-divider/#text=LXFOPVEFRNHRLXFOPVEFRNHR&n=3
 https://ipusiron.github.io/modular-text-divider/?text=LXFOPVEFRNHRLXFOPVEFRNHR&n=3
 ```
 
-Day028 RepeatSeq Analyzerからは暗号文と推定鍵長をtextとnで受け取れます。
+Day028 RepeatSeq Analyzerなどからは、暗号文と推定鍵長をtextとnで受け取れます。`#`より後ろ（推奨）と`?`より後ろのどちらでも受け取り、両方あれば`#`を優先します。
+`#`より後ろはサーバーへ送られないので、暗号文がGitHub Pagesに届かず、URLの長さの上限（GitHub Pagesはパスと`?`以降で8,192バイトまで）も受けません。`?`で1万字を渡すと、この上限を超えてエラーのページになります。
+読み込んだあとは、URLの`#`と`?`の両方からtextとnを消します。各列の「📊 頻度分析で開く」も`#text=`で渡します。
 鍵長の上限は20です。`?lang=ja`または`?lang=en`で言語を指定できます。
 
 **注意** URLには本文が含まれ、ブラウザーの履歴や共有先に残る可能性があります。
