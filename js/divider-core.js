@@ -56,8 +56,10 @@ const DividerCore = (() => {
     return '\uFEFF' + rows.map(r => r.map(csvCell).join(',')).join('\r\n') + '\r\n';
   }
 
-  function readParams(search) {
-    const p = new URLSearchParams(search);
+  // Hand-off values are read from after "#" first (never sent to the server, no URL length limit), then from "?".
+  function readParams(search, hash = '') {
+    const fromHash = new URLSearchParams(String(hash || '').replace(/^#/, ''));
+    const p = fromHash.has('text') ? fromHash : new URLSearchParams(search);
     const out = { text: null, n: null, warnings: [] };
     const text = p.get('text');
     if (text !== null) {
@@ -70,6 +72,18 @@ const DividerCore = (() => {
       if (v.ok) out.n = v.n; else out.warnings.push('badN');
     }
     return out;
+  }
+
+  // Path after removing text and n from both "?" and "#". null when neither has text or n.
+  function urlWithoutHandoff(href) {
+    const url = new URL(href);
+    const fromHash = new URLSearchParams(url.hash.slice(1));
+    const keys = ['text', 'n'];
+    const inHash = keys.some(k => fromHash.has(k));
+    if (!inHash && !keys.some(k => url.searchParams.has(k))) return null;
+    keys.forEach(k => { url.searchParams.delete(k); fromHash.delete(k); });
+    const hash = inHash ? fromHash.toString() : url.hash.slice(1);
+    return url.pathname + url.search + (hash ? `#${hash}` : '');
   }
 
   const ALPHA = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -133,6 +147,7 @@ const DividerCore = (() => {
   }
 
   return { MAX_N, MAX_PARAM_CHARS, MAX_FILE_BYTES, preprocess, validateN, split, csvCell, toCsv, readParams,
+    urlWithoutHandoff,
     ALPHA, ENGLISH_FREQ, isSolvable, shiftBack, letterCounts, chiSquare, bestShift, interleave, solve };
 })();
 

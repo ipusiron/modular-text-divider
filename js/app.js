@@ -239,7 +239,8 @@ function renderColumnOutputs(columns) {
     const truncated = Array.from(col).length > 5000;
     i18n.assign(analyzeBtn, truncated ? 'analyzeLong' : 'analyze');
     analyzeBtn.className = "analyze-btn-inline";
-    analyzeBtn.href = 'https://ipusiron.github.io/frequency-analyzer/?text=' +
+    // "#" keeps the column off the server (Day009 reads #text= first).
+    analyzeBtn.href = 'https://ipusiron.github.io/frequency-analyzer/#text=' +
       encodeURIComponent(Array.from(col).slice(0, 5000).join(''));
     analyzeBtn.target = '_blank';
     analyzeBtn.rel = 'noopener noreferrer';
@@ -346,7 +347,7 @@ function showToast(key, values = {}, duration = 3000) {
 
 // Consume hand-off parameters without retaining ciphertext in the address bar.
 function receiveParams() {
-  const params = DividerCore.readParams(location.search);
+  const params = DividerCore.readParams(location.search, location.hash);
   if (params.text !== null) {
     inputText.value = params.text;
     ['uppercase', 'alpha-only', 'remove-spaces'].forEach(id => { document.getElementById(id).checked = true; });
@@ -361,10 +362,8 @@ function receiveParams() {
     warning.append(item, document.createTextNode(' '));
   });
   if (params.text !== null && params.n !== null) performSplit();
-  const url = new URL(location.href);
-  url.searchParams.delete('text');
-  url.searchParams.delete('n');
-  try { history.replaceState(null, '', url); } catch { /* file origins can deny history changes. */ }
+  const cleaned = DividerCore.urlWithoutHandoff(location.href);
+  try { if (cleaned !== null) history.replaceState(null, '', cleaned); } catch { /* file origins can deny history changes. */ }
 }
 
 // ダークモード切り替え機能
