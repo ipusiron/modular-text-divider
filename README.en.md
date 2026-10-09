@@ -350,6 +350,20 @@ Example: `split_result_20250730_143025.csv`.
 
 ---
 
+## 🎯 Use cases
+
+### Ways of using this tool in particular
+
+- Confirming that splitting into columns of the key length makes each column a Caesar cipher (Vigenere-cryptanalysis classes): splitting a Vigenere ciphertext into as many columns as the key length makes each column the same Caesar cipher shifted by one key letter. Splitting the sample vigenere1 into 3 columns and solving each gives the key CAT. You can confirm that, once the key length is known, a polyalphabetic cipher can be solved as a per-column simple substitution
+- Confirming that each column is matched to the most English shift by chi-square (statistics and cryptanalysis classes): each column picks the shift with the smallest difference from English letter frequency (chi-square). For the first column of vigenere1, the chi-square of the correct shift is 32.70, far smaller than 1908.56 at shift 0. You can confirm, with numbers, choosing the shift with the smallest frequency gap to solve each column
+- Confirming that interleaving the columns back returns the plaintext (split-and-join classes): interleaving the solved columns in the original order returns the plaintext. For vigenere1, all-zero shifts leave `YHXPIGCPKK`, but the correct shifts give `WHENINAPRIL` (the plaintext). You can confirm the flow of splitting, solving, and joining back into one
+
+### General uses
+
+- Learn the cryptanalysis of a Vigenere cipher (split by key length and solve each column as a Caesar cipher)
+- In a CTF classical-cipher problem, split into columns for each candidate key length and try
+- Use it as material to explain decomposing a polyalphabetic cipher into a set of simple substitutions
+
 ## 🔒 Security
 
 Processing stays on the device; the page makes no automatic requests to external hosts.
