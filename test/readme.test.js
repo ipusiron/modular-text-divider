@@ -12,7 +12,7 @@ const headings = [
   ['🌐 デモページ', '🌐 Demo'], ['📸 スクリーンショット', '📸 Screenshots'], ['✨ 機能', '✨ Features'],
   ['📖 使い方', '📖 Usage'], ['🔐 ヴィジュネル暗号解読の典型的な流れ', '🔐 Typical Vigenère Cryptanalysis Workflow'],
   ['🔬 仕様と既知解答', '🔬 Specification and Known Answers'], ['🔗 他ツールとの連携', '🔗 Integration with Other Tools'],
-  ['🔧 技術的なメモ', '🔧 Technical Notes'], ['🔒 セキュリティ', '🔒 Security'], ['🧪 テスト', '🧪 Tests'],
+  ['🔧 技術的なメモ', '🔧 Technical Notes'], ['🎯 ユースケース', '🎯 Use cases'], ['🔒 セキュリティ', '🔒 Security'], ['🧪 テスト', '🧪 Tests'],
   ['📁 ディレクトリー構造', '📁 Directory Structure'], ['💻 動作環境', '💻 Requirements'],
   ['📄 ライセンス', '📄 License'], ['🛠️ このツールについて', '🛠️ About This Tool']
 ];
@@ -68,7 +68,7 @@ for (const [lang, file] of docs.entries()) {
   });
 
   test(`${file}: complete annotated directory tree`, () => {
-    const tree = doc.split('## ' + headings[10][lang])[1].match(/```text\n([\s\S]*?)```/)[1];
+    const tree = doc.split('## ' + headings[11][lang])[1].match(/```text\n([\s\S]*?)```/)[1];
     const entries = [];
     const stack = [];
     for (const line of tree.trimEnd().split('\n')) {
@@ -104,4 +104,21 @@ test('Japanese YAML structure and immutable metadata match HEAD', () => {
   for (const key of ['category_ja', 'category_en', 'tags']) assert.match(yaml(head), new RegExp(key + ':\\n  - '));
   assert.match(read('README.md'), /English: \[README.en.md\]\(README.en.md\)/);
   assert.match(read('README.en.md'), /日本語: \[README.md\]\(README.md\)/);
+});
+
+test('ユースケースの「このツールならではの使い方」を divider-core.js で再計算（日英）', () => {
+  const readSample = (id, file) => fs.readFileSync(path.join(root, 'samples', id, file), 'utf8');
+  const [ja, en] = docs.map(read);
+  const text = core.preprocess(readSample('vigenere1', 'ciphertext.txt'), { upper: true, alphaOnly: true });
+  const { columns } = core.split(text, 3);
+  const shifts = columns.map(core.bestShift);
+  const result = core.solve(columns, shifts);
+  assert.equal(result.key, 'CAT');
+  assert.equal(result.plain.slice(0, 11), 'WHENINAPRIL');
+  assert.equal(core.solve(columns, [0, 0, 0]).plain.slice(0, 10), 'YHXPIGCPKK');
+  assert.deepEqual([core.chiSquare(columns[0], shifts[0]).toFixed(2), core.chiSquare(columns[0], 0).toFixed(2)], ['32.70', '1908.56']);
+  for (const md of [ja, en]) {
+    assert.ok(md.includes('CAT') && md.includes('WHENINAPRIL') && md.includes('YHXPIGCPKK'));
+    assert.ok(md.includes('32.70') && md.includes('1908.56'));
+  }
 });
